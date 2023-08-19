@@ -12,13 +12,13 @@
           :src="'http://localhost:8081/file/' + product.imageEntities[1].imgURL"
           alt=""
           class="img-select__img"
-          @click="imgNumber = 0"
+          @click="imgNumber = 1"
         />
         <img
           :src="'http://localhost:8081/file/' + product.imageEntities[2].imgURL"
           alt=""
           class="img-select__img"
-          @click="imgNumber = 0"
+          @click="imgNumber = 2"
         />
       </div>
       <img
@@ -79,16 +79,21 @@
         </div>
         <h3 class="">Chọn số lượng: {{ numItem }}</h3>
         <div class="select__num-item">
-          <div class="num-item" @click="numItem = numItem - 1">-</div>
+          <div class="num-item" @click="setNumItem(-1)">-</div>
           <input
             type="text"
             class="input__num-item"
             :placeholder="numItem"
             v-model="numItem"
           />
-          <div class="num-item" @click="numItem += 1">+</div>
+          <div class="num-item" @click="setNumItem(1)">+</div>
         </div>
         <button class="btn-buy" @click="addCart()">Add to cart</button>
+
+        <h2>Thông tin chi tiết</h2>
+        <div class="description">
+          {{ product.description }}
+        </div>
       </div>
     </div>
     <div v-else>
@@ -241,6 +246,13 @@ export default {
       this.sizeItem = size;
     },
 
+    setNumItem(num) {
+      this.numItem = Number(this.numItem);
+      if (this.numItem + num > 0) {
+        this.numItem += Number(num);
+      }
+    },
+
     async getProduct() {
       try {
         const response = await axios.get(
@@ -318,7 +330,7 @@ export default {
       }
       try {
         const response = await axios.post(
-          "http://localhost:8081/evaluate/create/" + this.products.id,
+          "http://localhost:8081/evaluate/create/" + this.product.id,
           {
             rate: this.userRate,
             comment: this.comment,
@@ -332,7 +344,7 @@ export default {
         );
         console.log(response);
         window.location.replace(
-          "http://localhost:8080/shop/" + this.products.id
+          "http://localhost:8080/shop/" + this.product.id
         );
       } catch (error) {
         console.error(error);
@@ -452,16 +464,20 @@ export default {
   width: 400px;
   height: 50px;
   border: 2px solid #000;
-  background-color: #fff;
-  color: #000;
+  background-color: #42b983;
+  color: #fff;
   border-radius: 10px;
   margin-top: 20px;
+  margin-bottom: 25px;
 }
 
 .btn-buy:hover {
   cursor: pointer;
-  background-color: #42b983;
-  color: #fff;
+  opacity: 0.8;
+}
+
+.description {
+  padding: 10px;
 }
 
 .evaluate-product {

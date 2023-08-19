@@ -86,9 +86,9 @@ export default {
         this.addCartItemOder(this.shoppingCart[i].product.id, this.shoppingCart[i].size, this.shoppingCart[i].quantity);
         console.log(this.shoppingCart[i].product.id);
       }
-      // localStorage.removeItem("shoppingCart");
+      localStorage.removeItem("shoppingCart");
       alert("Đặt hàng thành công");
-      // this.$router.push("/");
+      this.$router.push("/");
     },
 
     async createOder() {
