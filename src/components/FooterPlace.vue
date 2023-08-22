@@ -7,7 +7,7 @@
             <div class="footer-col">
               <h4>company</h4>
               <ul>
-                <li><a href="#">about us</a></li>
+                <li><router-link to="/about">about us</router-link></li>
                 <li><a href="#">our services</a></li>
                 <li><a href="#">privacy policy</a></li>
                 <li><a href="#">affiliate program</a></li>
@@ -26,20 +26,20 @@
             <div class="footer-col">
               <h4>online shop</h4>
               <ul>
-                <li><a href="#">watch</a></li>
-                <li><a href="#">bag</a></li>
-                <li><a href="#">shoes</a></li>
-                <li><a href="#">dress</a></li>
+                <li><router-link to="/shop">watch</router-link></li>
+                <li><router-link to="/shopcart">bag</router-link></li>
+                <li><router-link to="/men">men</router-link></li>
+                <li><router-link to="/women">women</router-link></li>
               </ul>
             </div>
             <div class="footer-col">
               <h4>follow us</h4>
               <div class="social-links">
-                <a href="#"
+                <a href="https://www.facebook.com/profile.php?id=100009417381746"
                   ><font-awesome-icon :icon="['fab', 'facebook-f']"
                 /></a>
-                <a href="#"><font-awesome-icon :icon="['fab', 'twitter']" /></a>
-                <a href="#"
+                <a href="https://twitter.com/nbva16"><font-awesome-icon :icon="['fab', 'twitter']" /></a>
+                <a href="https://www.instagram.com/vietanhnguyenba/"
                   ><font-awesome-icon :icon="['fab', 'instagram']"
                 /></a>
               </div>

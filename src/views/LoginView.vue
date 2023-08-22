@@ -7,7 +7,7 @@
       </div>
       <div class="login-content">
         <div action="index.html">
-          <form>
+          <form @submit.prevent="login">
             <img src="../assets/img/avatar.svg" />
             <h2 class="title">Welcome</h2>
             <div class="input-div one">
@@ -36,8 +36,8 @@
                 />
               </div>
             </div>
-          </form>
           <button type="submit" class="btn" @click="login">Login</button>
+          </form>
           <a href="#">Forgot Password?</a>
         </div>
       </div>
@@ -50,7 +50,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      isLogin: true,
+      // isLogin: true,
       username: "",
       password: "",
       token: "",
@@ -59,15 +59,36 @@ export default {
   },
   methods: {
     async login() {
-      const response = await axios.post("http://localhost:8081/api/login", {
-        username: this.username,
-        password: this.password,
-      });
-      this.token = response.data.jwt;
-      localStorage.setItem("token", this.token);
-      window.location.replace("http://localhost:8080/");
+      try {
+        const response = await axios.post("http://localhost:8081/api/login", {
+          username: this.username,
+          password: this.password,
+        });
+        this.token = response.data.jwt;
+        localStorage.setItem("token", this.token);
+        this.current(),
+        this.$emit('user-sent', this.user);
+        window.location.replace("http://localhost:8080/");
+      } catch(error) {
+        alert("Tài khoản hoặc mật khẩu không đúng")
+      }
     },
     
+    async current() {
+      try {
+        const response = await axios.get("http://localhost:8081/api/current", {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        });
+        this.user = response.data.userEntity;
+        return this.user;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     // },
     // async getRandom() {
     //   try {

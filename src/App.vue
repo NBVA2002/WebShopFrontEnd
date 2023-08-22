@@ -1,7 +1,7 @@
 <template>
   <div>
     <base-nav class="navbar" :islogin="isLogin"/>
-    <router-view class="view" :islogin="isLogin"/>
+    <router-view class="view" :islogin="isLogin" @user-sent="checkUser"/>
     <footer-place class="footer" />
   </div>
 </template>
@@ -28,6 +28,7 @@ export default {
   created() {
     this.isLogin = this.checkLogin();
     console.log("is Login: " + this.isLogin);
+        console.log(this.user)
   },
 
   methods: {
@@ -36,6 +37,11 @@ export default {
         return true;
       }
       return false;
+    },
+    checkUser(data) {
+      // if (this.checkLogin()) {
+        this.user = data
+      // }
     },
   },
 };

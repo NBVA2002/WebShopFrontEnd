@@ -47,16 +47,13 @@
         </li>
       </ul>
     </div>
+    <button class="logout" @click="logout">LogOut</button>
   </div>
 </template>
 
 <script>
 export default {
   // methods: {
-  //   logout() {
-  //     localStorage.removeItem("token");
-  //     window.location.replace("http://localhost:8080/");
-  //   },
   // }
   data() {
     return {
@@ -71,36 +68,49 @@ export default {
   },
  
   methods: {
+
+    logout() {
+      localStorage.removeItem("token");
+      window.location.replace("http://localhost:8080/");
+    },
+
     addProduct() {
       if (this.newProduct.name && this.newProduct.date && this.newProduct.details && this.newProduct.imageUrl) {
         this.products.push({ ...this.newProduct });
         this.clearForm();
       }
     },
+
     editProduct(index) {
       this.editingIndex = index;
       this.newProduct = { ...this.products[index] };
     },
+
     updateProduct() {
       if (this.editingIndex !== null) {
         this.products[this.editingIndex] = { ...this.newProduct };
         this.cancelEdit();
       }
     },
+
     cancelEdit() {
       this.editingIndex = null;
       this.clearForm();
     },
+
     deleteProduct(index) {
       this.products.splice(index, 1);
     },
+
     clearForm() {
       this.newProduct = { name: "", date: null, details: "", imageUrl: "" };
     },
+
     formatDate(date) {
       const options = { year: 'numeric', month: 'short', day: 'numeric' };
       return new Date(date).toLocaleDateString(undefined, options);
     },
+    
     handleImageUpload(event) {
       const file = event.target.files[0];
       if (file) {

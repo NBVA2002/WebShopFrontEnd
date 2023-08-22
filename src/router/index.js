@@ -114,6 +114,15 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    // Nếu có savedPosition, sử dụng nó để di chuyển đến vị trí đã lưu trước đó
+    if (savedPosition) {
+      return savedPosition;
+    }
+    
+    // Di chuyển đến đầu trang của trang mới khi chuyển đổi router
+    return { top: 0};
+  }
 });
 
 export default router;

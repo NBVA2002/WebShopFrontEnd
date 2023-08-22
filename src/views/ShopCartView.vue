@@ -5,8 +5,8 @@
         <div class="list-item">
           <div
             class="item"
-            v-for="cartegoryItem in shoppingCart"
-            :key="cartegoryItem.product.id"
+            v-for="(cartegoryItem, idx) in shoppingCart"
+            :key="idx"
           >
             <img
               :src="
@@ -17,20 +17,43 @@
               class="item-img"
             />
             <div class="item-product">
-              {{ cartegoryItem.product.productName }}
-              <h3>{{ formatPrice(cartegoryItem.product.price) }}</h3>
+              <h2>{{ cartegoryItem.product.productName }}</h2>
               <h3>Size: {{ cartegoryItem.size }}</h3>
-              <h3>Số lượng: {{ cartegoryItem.quantity }}</h3>
+              <h3>{{ formatPrice(cartegoryItem.product.price) }}</h3>
             </div>
+            <div class="item-quantity">
+              <h3>Số lượng:</h3>
+              <div class="select__num-item">
+                <div
+                  class="num-item"
+                  @click="setNumItem(idx, -1)"
+                >
+                  -
+                </div>
+                <input
+                  type="text"
+                  class="input__num-item"
+                  :placeholder="cartegoryItem.quantity"
+                  v-model="cartegoryItem.quantity"
+                />
+                <div
+                  class="num-item"
+                  @click="setNumItem(idx, 1)"
+                >
+                  +
+                </div>
+              </div>
+            </div>
+            <button class="decart" @click="deCart(idx)">x</button>
           </div>
         </div>
       </div>
       <div class="order-sumary">
-        <h1>Order Summary</h1>
+        <h1>Tổng tiền:</h1>
         <div class="total">
-          <h3>Thành tiền: {{ formatPrice(amount) }}</h3>
-          <button class="btn-order" @click="sendOrder">Đặt hàng</button>
+          <h1>{{ formatPrice(amount) }}</h1>
         </div>
+          <button class="btn-order" @click="sendOrder">Đặt hàng</button>
       </div>
     </div>
   </div>
@@ -79,16 +102,43 @@ export default {
       console.log(localStorage.getItem("shoppingCart"));
     },
 
+    setNumItem(idx, num) {
+      if (this.shoppingCart[idx].quantity + num > 0) {
+        this.shoppingCart[idx].quantity += num;
+        localStorage.setItem("shoppingCart", JSON.stringify(this.shoppingCart.reverse()));
+      this.shoppingCart.reverse() 
+      }
+      console.log(this.shoppingCart[idx].quantity + num);
+      this.amount = 0
+      this.shoppingCart.forEach((cartItem) => {
+        this.amount += cartItem.product.price * cartItem.quantity;
+      });
+    },
+
+    deCart(idx) {
+      this.shoppingCart.splice(idx, 1);
+      localStorage.setItem("shoppingCart", JSON.stringify(this.shoppingCart.reverse()));
+      this.shoppingCart.reverse() 
+      this.amount = 0
+      this.shoppingCart.forEach((cartItem) => {
+        this.amount += cartItem.product.price * cartItem.quantity;
+      });
+    },
+
     async sendOrder() {
-      this.orderId = await this.createOder()
+      this.orderId = await this.createOder();
       console.log(this.orderId);
       for (var i = 0; i < this.shoppingCart.length; i++) {
-        this.addCartItemOder(this.shoppingCart[i].product.id, this.shoppingCart[i].size, this.shoppingCart[i].quantity);
+        this.addCartItemOder(
+          this.shoppingCart[i].product.id,
+          this.shoppingCart[i].size,
+          this.shoppingCart[i].quantity
+        );
         console.log(this.shoppingCart[i].product.id);
       }
       localStorage.removeItem("shoppingCart");
       alert("Đặt hàng thành công");
-      this.$router.push("/");
+      this.$router.push("/user");
     },
 
     async createOder() {
@@ -124,7 +174,7 @@ export default {
             },
           }
         );
-          return response.data.id;
+        return response.data.id;
       } catch (error) {
         console.error(error);
       }
@@ -145,6 +195,7 @@ export default {
   margin-top: 20px;
   margin-bottom: 20px;
   background-color: #c0c0c0;
+  
 }
 
 .order-sumary {
@@ -159,6 +210,8 @@ export default {
   margin-top: 20px;
   margin-bottom: 20px;
   background-color: #c0c0c0;
+  border-radius: 20px;
+  padding: 20px;
 }
 
 .list-item {
@@ -174,24 +227,88 @@ export default {
   width: 100%;
   height: 150px;
   background-color: #fff;
-  padding: 20px;
+  /* padding: 20px; */
   border: 2px solid #000;
   border-radius: 20px;
   box-sizing: border-box;
   box-shadow: 0 0 10px #c0c0c0;
   display: flex;
+  justify-content: space-between;
 }
 
 .item img {
   width: 100px;
   object-fit: cover;
-  margin-left: 20px;
+  border: 1px solid #000;
   border-radius: 20px;
 }
 
 .item-product {
+  padding: 20px;
+  width: 350px;
   display: inline-block;
-  margin-left: 30px;
+  text-align: left;
+}
+
+.decart {
+  width: 60px;
+  background-color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 20px;
+}
+
+.decart:hover {
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.item-quantity {
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.select__num-item {
+  display: flex;
+  width: 100%;
+  padding-bottom: 30px;
+}
+
+.input__num-item {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #c0c0c0;
+  text-align: center;
+  line-height: 40px;
+  font-size: 20px;
+  color: black;
+}
+
+.num-item {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #c0c0c0;
+  text-align: center;
+  line-height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.btn-order {
+  width: 80%;
+  height: 50px;
+  border-radius: 20px;
+  background-color: #fff;
+  border: 2px solid #000;
+  margin-left: 50px;
+}
+
+.btn-order:hover {
+  color: #fff;
+  background-color: #42b983;
 }
 
 .grid {

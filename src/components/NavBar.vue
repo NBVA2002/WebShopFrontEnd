@@ -53,9 +53,11 @@ export default {
     login() {
       this.$router.push("/login");
     },
+
     adminCheck() {
       return this.user.roles == "ROLE_ADMIN";
     },
+
     async current() {
       try {
         const response = await axios.get("http://localhost:8081/api/current", {
@@ -80,6 +82,7 @@ export default {
 </script>
 
 <style scoped>
+
 .nav-bar {
   background: #fff;
   box-shadow: 0px 4px 5px 0px rgba(0, 0, 0, 0.05);
