@@ -104,7 +104,7 @@
         <div class="content">Đánh giá sản phẩm</div>
         <div class="comment">
           <div class="user-comment">
-            <div class="username">username</div>
+            <div class="username">{{user.lastName}}</div>
             <div class="rate-star">
               <font-awesome-icon
                 :icon="['fas', 'star']"
@@ -208,7 +208,7 @@ export default {
     };
   },
 
-  props: ["islogin"],
+  props: ["islogin", "isAdmin", "user"],
 
   created() {
     this.getProduct();
@@ -330,7 +330,7 @@ export default {
       }
       try {
         const response = await axios.post(
-          "http://localhost:8081/evaluate/create/" + this.product.id,
+          "http://localhost:8081/evaluate/create/" + this.$route.params.id,
           {
             rate: this.userRate,
             comment: this.comment,
@@ -545,6 +545,7 @@ export default {
   font-size: 20px;
   padding: 20px;
   box-sizing: border-box;
+  border-radius: 20px;
 }
 
 .comment-place {

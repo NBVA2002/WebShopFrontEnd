@@ -9,7 +9,7 @@
         <div action="index.html">
           <form @submit.prevent="login">
             <img src="../assets/img/avatar.svg" />
-            <h2 class="title">Welcome</h2>
+            <h2 class="title">Quên mật khẩu</h2>
             <div class="input-div one">
               <div class="i">
                 <font-awesome-icon :icon="['fas', 'user']" />
@@ -23,22 +23,9 @@
                 />
               </div>
             </div>
-            <div class="input-div pass">
-              <div class="i">
-                <font-awesome-icon :icon="['fas', 'lock']" />
-              </div>
-              <div class="div">
-                <input
-                  type="password"
-                  class="input"
-                  placeholder="Password"
-                  v-model="password"
-                />
-              </div>
-            </div>
-          <button type="submit" class="btn" @click="login">Login</button>
+          
+          <button type="submit" class="btn" @click="login">Lấy lại mật khẩu</button>
           </form>
-          <router-link to="/forgot">Forgot Password</router-link>
         </div>
       </div>
     </div>
@@ -60,51 +47,14 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await axios.post("http://localhost:8081/api/login", {
-          username: this.username,
-          password: this.password,
-        });
-        this.token = response.data.jwt;
-        localStorage.setItem("token", this.token);
-        // this.current(),
-        // this.$emit('user-sent', this.user);
-        window.location.replace("http://localhost:8080/");
+        const response = await axios.post("http://localhost:8081/mail/forgot?username="+this.username);
+        alert("Kiểm tra email để lấy lại mật khẩu");  
+        return response.data;
       } catch(error) {
-        alert("Tài khoản hoặc mật khẩu không đúng")
+        alert("Tài khoản không tồn tại")
       }
     },
     
-    async current() {
-      try {
-        const response = await axios.get("http://localhost:8081/api/current", {
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        });
-        this.user = response.data.userEntity;
-        return this.user;
-      } catch (error) {
-        console.error(error);
-      }
-    },
-
-    // },
-    // async getRandom() {
-    //   try {
-    //     const response = await axios.get("http://localhost:8081/api/random", {
-    //       headers: {
-    //         Authorization: "Bearer " + localStorage.getItem("token"),
-    //       },
-    //     });
-    //     console.log(response);
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // },
-    // sendMessage() {
-    //   this.$emit('message-sent', 'Hello from child');
-    // }
   },
 };
 </script>
@@ -177,6 +127,13 @@ form {
   margin: 25px 0;
   padding: 5px 0;
   border-bottom: 2px solid #d9d9d9;
+}
+
+.lable {
+  width: 100%;
+  font-size: 20px;
+  text-align: left;
+  font-weight: 500;
 }
 
 .login-content .input-div.one {

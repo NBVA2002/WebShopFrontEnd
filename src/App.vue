@@ -1,14 +1,24 @@
 <template>
   <div>
-    <base-nav class="navbar" :islogin="isLogin"/>
-    <router-view class="view" :islogin="isLogin" @user-sent="checkUser"/>
+    <base-nav
+      class="navbar"
+      :islogin="isLogin"
+      :isAdmin="adminCheck()"
+      :user="userCurrent"
+    />
+    <router-view
+      class="view"
+      :islogin="isLogin"
+      :isAdmin="adminCheck()"
+      :user="userCurrent"
+    />
     <footer-place class="footer" />
   </div>
 </template>
 
 <script>
 import NavBar from "./components/NavBar.vue";
-// import axios from "axios";
+import axios from "axios";
 import FooterPlace from "./components/FooterPlace.vue";
 export default {
   name: "App",
@@ -19,16 +29,20 @@ export default {
 
   data() {
     return {
-      user: {},
       isLogin: false,
       isAdmin: false,
+      userCurrent: {},
     };
   },
 
   created() {
     this.isLogin = this.checkLogin();
+    if (this.isLogin) {
+      this.current();
+      this.adminCheck();
+    }
     console.log("is Login: " + this.isLogin);
-        console.log(this.user)
+    console.log("is Admin: " + this.isAdmin);
   },
 
   methods: {
@@ -38,10 +52,24 @@ export default {
       }
       return false;
     },
-    checkUser(data) {
-      // if (this.checkLogin()) {
-        this.user = data
-      // }
+
+    adminCheck() {
+      return this.userCurrent.roles == "ROLE_ADMIN";
+    },
+
+    async current() {
+      try {
+        const response = await axios.get("http://localhost:8081/api/current", {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        });
+        this.userCurrent = response.data.userEntity;
+        return this.userCurrent;
+      } catch (error) {
+        console.error(error);
+      }
     },
   },
 };
@@ -59,7 +87,7 @@ export default {
 .navbar {
   position: fixed;
   top: 0;
-  z-index: 1;
+  z-index: 2;
 }
 
 .view {

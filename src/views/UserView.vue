@@ -141,7 +141,8 @@
         >
           <div class="display-item underline">
             <h4>Mã đơn hàng: {{ orderItem.id }}</h4>
-            <h4>Tổng tiền {{ formatPrice(orderItem.totalPrice) }}</h4>
+            <h4>Tổng tiền: {{ formatPrice(orderItem.totalPrice) }}</h4>
+            <h4>Ngày đặt hàng: {{ orderItem.orderDate }}</h4>
             <h4>Tình trạng: {{ getStatus(orderItem.hasProcess) }}</h4>
           </div>
 
@@ -239,10 +240,13 @@ export default {
       totalPage: 0,
     };
   },
+
+  props: ["islogin", "isAdmin"],
+
   methods: {
     logout() {
       localStorage.removeItem("token");
-      window.location.replace("http://localhost:8080/");
+      window.location.replace("http://localhost:8080/login");
     },
 
     formatPrice(number) {
@@ -368,7 +372,11 @@ export default {
   },
 
   created() {
-    this.current();
+    if (!this.islogin) {
+      this.$router.push("/login");
+    } else {
+      this.current();
+    }
   },
 
   computed: {

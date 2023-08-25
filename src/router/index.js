@@ -44,6 +44,18 @@ const routes = [
       import("../views/RegisterView.vue"),
   },
   {
+    path: "/forgot",
+    name: "forgot",
+    component: () =>
+      import("../views/ForgotPasswordView.vue"),
+  },
+  {
+    path: "/change/:token",
+    name: "change",
+    component: () =>
+      import("../views/ChangePasswordView.vue"),
+  },
+  {
     path: "/search",
     name: "search",
     component: () =>
@@ -98,6 +110,18 @@ const routes = [
       import("../views/AccessoriesView.vue"),
   },
   {
+    path: "/collection",
+    name: "collection",
+    component: () =>
+      import("../views/CollectionView.vue"),
+  },
+  {
+    path: "/collection/summercollection",
+    name: "summercollection",
+    component: () =>
+      import("../views/SummerCollectionView.vue"),
+  },
+  {
     path: "/user",
     name: "user",
     component: () =>
@@ -108,6 +132,18 @@ const routes = [
     name: "admin",
     component: () =>
       import("../views/AdminView.vue"),
+  },
+  {
+    path: "/404",
+    name: "404",
+    component: () =>
+      import("../views/404View.vue"),
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "404",
+    component: () =>
+      import("../views/404View.vue"),
   },
 ];
 

@@ -1,15 +1,15 @@
 <template>
   <div class="container">
-    <img class="wave" src="../assets/img/wave.png">
-	<div class="container">
-		<div class="img">
-			<img src="../assets/img/undraw_window_shopping_re_0kbm.svg">
-		</div>
-		<div class="login-content" id="form-1">
-			<form action="index.html">
-				<img src="../assets/img/avatar.svg">
-				<h2 class="title">Let's Register</h2>
-				<!-- <div class="input-div one">
+    <img class="wave" src="../assets/img/wave.png" />
+    <div class="container">
+      <div class="img">
+        <img src="../assets/img/undraw_window_shopping_re_0kbm.svg" />
+      </div>
+      <div class="login-content" id="form-1">
+        <form action="index.html">
+          <img src="../assets/img/avatar.svg" />
+          <h2 class="title">Let's Register</h2>
+          <!-- <div class="input-div one">
 					<div class="i">
 						<font-awesome-icon :icon="['fas', 'user']" />
 					</div>
@@ -54,72 +54,72 @@
 						<input type="text" class="input ">
 					</div>
 				</div> -->
-        <div class="input-div one">
-					<div class="i">
-						<i class="fas fa-user"></i>
-					</div>
-					<div class="div">
-						<h5>First Name</h5>
-						<input id="fname" type="text" class="input">
-						<small></small>
-					</div>
-				</div>
-				<div class="input-div one">
-					<div class="i">
-						<i class="fas fa-user"></i>
-					</div>
-					<div class="div">
-						<h5>Last Name</h5>
-						<input id="lname" type="text" class="input">
-						<small></small>
-					</div>
-				</div>
-				<div class="input-div pass">
-					<div class="i">
-						<i class="fas fa-lock"></i>
-					</div>
-					<div class="div">
-						<h5>Password</h5>
-						<input id="pass" type="password" class="input">
-						<small></small>
-					</div>
-				</div>
-				<div class="input-div pass">
-					<div class="i">
-						<i class="fas fa-lock"></i>
-					</div>
-					<div class="div">
-						<h5>Password Confirm</h5>
-						<input id="conpass" type="password" class="input">
-						<small></small>
-					</div>
-				</div>
-				<div class="input-div phone">
-					<div class="i">
-						<i class="fas fa-phone"></i>
-					</div>
-					<div class="div">
-						<h5>Phone Number</h5>
-						<input id="phone" type="text" class="input">
-						<small></small>
-					</div>
-				</div>
-				<div class="input-div phone">
-					<div class="i">
-						<i class="fas fa-envelope"></i>
-					</div>
-					<div class="div">
-						<h5>Email</h5>
-						<input id ="emails" type="email" class="input">
-						<small></small>
-					</div>
-				</div>
-				<input type="submit" class="btn" value="Register">
-			</form>
-		</div>
-	</div>
+          <div class="input-div one">
+            <div class="i">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="div">
+              <h5>First Name</h5>
+              <input id="fname" type="text" class="input" />
+              <small></small>
+            </div>
+          </div>
+          <div class="input-div one">
+            <div class="i">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="div">
+              <h5>Last Name</h5>
+              <input id="lname" type="text" class="input" />
+              <small></small>
+            </div>
+          </div>
+          <div class="input-div pass">
+            <div class="i">
+              <i class="fas fa-lock"></i>
+            </div>
+            <div class="div">
+              <h5>Password</h5>
+              <input id="pass" type="password" class="input" />
+              <small></small>
+            </div>
+          </div>
+          <div class="input-div pass">
+            <div class="i">
+              <i class="fas fa-lock"></i>
+            </div>
+            <div class="div">
+              <h5>Password Confirm</h5>
+              <input id="conpass" type="password" class="input" />
+              <small></small>
+            </div>
+          </div>
+          <div class="input-div phone">
+            <div class="i">
+              <i class="fas fa-phone"></i>
+            </div>
+            <div class="div">
+              <h5>Phone Number</h5>
+              <input id="tel" type="text" class="input" />
+              <small></small>
+            </div>
+          </div>
+          <div class="input-div phone">
+            <div class="i">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="div">
+              <h5>Email</h5>
+              <input id="emails" type="email" class="input" />
+              <small></small>
+            </div>
+          </div>
+          <input type="submit" class="btn" value="Register" />
+        </form>
+      </div>
+    </div>
 
-  <!-- <img class="wave" src="img/wave.png">
+    <!-- <img class="wave" src="img/wave.png">
 	<div class="container">
 		<div class="img">
 			<img src="img/undraw_shopping_re_hdd9.svg">
@@ -219,6 +219,29 @@ export default {
       localStorage.setItem("token", this.token);
       window.location.replace("http://localhost:8080/");
     },
+
+    // validateEmail(inputText) {
+    //   var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    //   if (inputText.value.match(mailformat)) {
+    //     alert("Valid email address!");
+    //     document.form1.text1.focus();
+    //     return true;
+    //   } else {
+    //     alert("You have entered an invalid email address!");
+    //     document.form1.text1.focus();
+    //     return false;
+    //   }
+    // },
+
+    // phonenumber(inputtxt) {
+    //   var phoneno = /^\d{10}$/;
+    //   if (inputtxt.value.match(phoneno)) {
+    //     return true;
+    //   } else {
+    //     alert("message");
+    //     return false;
+    //   }
+    // },
     // async current() {
     //   try {
     //     const response = await axios.get("http://localhost:8081/api/current", {

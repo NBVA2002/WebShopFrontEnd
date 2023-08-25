@@ -15,13 +15,13 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 /* import specific icons */
-import { faCartShopping, faUserSecret, faFilter ,faUser, faBell, faMagnifyingGlass, faLock, faStar , faSortUp, faSortDown, faRightFromBracket} from '@fortawesome/free-solid-svg-icons'
+import { faCartShopping, faUserSecret, faFilter ,faUser, faBell, faMagnifyingGlass, faLock, faStar , faSortUp, faSortDown, faRightFromBracket, faUsers, faBars, faBagShopping, faCreditCard} from '@fortawesome/free-solid-svg-icons'
 import { faDownload} from '@fortawesome/free-solid-svg-icons'
 import { faFacebookF, faTwitter, faInstagram } from '@fortawesome/free-brands-svg-icons'
 
 library.add(faDownload)
 library.add(faFacebookF, faTwitter, faInstagram)
-library.add(faUserSecret, faCartShopping, faFilter, faUser, faBell, faMagnifyingGlass, faLock, faStar, faSortUp, faSortDown,faRightFromBracket)
+library.add(faUserSecret, faCartShopping, faFilter, faUser, faBell, faMagnifyingGlass, faLock, faStar, faSortUp, faSortDown,faRightFromBracket, faUsers, faBars, faBagShopping,faCreditCard)
 
 createApp(App).use(Antd).use(router).component('font-awesome-icon', FontAwesomeIcon).mount("#app");
 

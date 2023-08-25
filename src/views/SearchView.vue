@@ -13,74 +13,18 @@
       <button type="submit" class="search-btn">Tìm kiếm</button>
     </form>
 
-    <div class="grid"  v-if="isSearch && search !=''">
+    <div class="grid" v-if="isSearch && search != ''">
       <div class="select-type">
         <div
           class="sort__by-name"
-          @click="changeType(`Áo sơ mi`)"
-          :class="{ typesort__active: type == 'Áo sơ mi' }"
+          v-for="type in listType"
+          :key="type.id"
+          @click="changeType(type.id)"
+          :class="{ typesort__active: category == type.id }"
         >
-          Áo sơ mi
+          {{ type.categoryName }}
         </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Áo thun`)"
-          :class="{ typesort__active: type == 'Áo thun' }"
-        >
-          Áo thun
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Áo khoác`)"
-          :class="{ typesort__active: type == 'Áo khoác' }"
-        >
-          Áo khoác
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Quần jean`)"
-          :class="{ typesort__active: type == 'Quần jean' }"
-        >
-          Quần jean
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Quần lửng`)"
-          :class="{ typesort__active: type == 'Quần lửng' }"
-        >
-          Quần lửng
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Quần short`)"
-          :class="{ typesort__active: type == 'Quần short' }"
-        >
-          Quần short
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Váy`)"
-          :class="{ typesort__active: type == 'Váy' }"
-        >
-          Váy
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Túi`)"
-          :class="{ typesort__active: type == 'Túi' }"
-        >
-          Túi
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Giày`)"
-          :class="{ typesort__active: type == 'Giày' }"
-        >
-          Giày
-        </div>
-        <div class="btn_untype" @click="unType" v-if="displayTypeFilter">
-          x
-        </div>
+        <div class="btn_untype" @click="unType" v-if="displayTypeFilter">x</div>
       </div>
 
       <div class="show">
@@ -267,6 +211,8 @@ export default {
       url: "http://localhost:8081/product/list?",
       search: "",
       gender: "",
+      categorytype: 0,
+      category: 0,
       type: "",
       userRateFilter: 0,
       priceGT: 0,
@@ -286,6 +232,7 @@ export default {
 
   created() {
     this.getList();
+    this.getTypeList();
   },
 
   methods: {
@@ -336,8 +283,8 @@ export default {
       this.getList();
     },
 
-    changeType(nameType) {
-      this.type = nameType;
+    changeType(typeId) {
+      this.category = typeId;
       this.pageNumber = 1;
       this.getList();
       this.displayTypeFilter = true;
@@ -371,6 +318,17 @@ export default {
       this.displayFilter = false;
     },
 
+    async getTypeList() {
+      try {
+        const response = await axios.get(
+          "http://localhost:8081/category/list?type=0&limit=100&page=1"
+        );
+        this.listType = response.data.content;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     async getList() {
       try {
         var string =
@@ -379,6 +337,10 @@ export default {
           this.search +
           "&gender=" +
           this.gender +
+          "&categorytype=" +
+          this.categorytype +
+          "&category=" +
+          this.category +
           "&type=" +
           this.type +
           "&rate=" +
@@ -487,7 +449,7 @@ export default {
 }
 
 .banner {
-  background-image: url("../assets/images/banner/b1.jpg");
+  background-image: url("../assets/images/about/banner.png");
   width: 100%;
   height: 400px;
   /* background-repeat: no-repeat; */
@@ -591,8 +553,7 @@ export default {
   border: 1px solid #c0c0c0;
   border-radius: 30px;
   line-height: 15px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin: 10px;
   transform: translateY(10px);
 }
 
@@ -741,13 +702,12 @@ export default {
 } */
 
 .sort__by-name {
-  width: 100px;
+  width: 120px;
   height: 40px;
   line-height: 40px;
   border: 1px solid #c0c0c0;
   border-radius: 10px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin: 10px;
 }
 
 .sort__by-name:hover {

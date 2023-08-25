@@ -1,44 +1,17 @@
 <template>
   <div class="products">
     <div class="banner"></div>
-
-    <!-- <form @submit.prevent="onSearch" class="search">
-      <input
-        type="text"
-        class="search-input"
-        placeholder="Search..."
-        v-model="search"
-        id="idsearch"
-      />
-      <button type="submit" class="search-btn">Tìm kiếm</button>
-    </form> -->
-
     <div class="grid">
       <div class="select-type">
         <div
-          class="sort__by-name"
-          @click="changeType(`Áo sơ mi`)"
-          :class="{ typesort__active: type == 'Áo sơ mi' }"
+          class="sort__by-name"  v-for="type in listType" :key="type.id"
+          @click="changeType(type.id)"
+          :class="{ typesort__active: category == type.id }"
         >
-          Áo sơ mi
+          {{ type.categoryName }}
         </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Áo thun`)"
-          :class="{ typesort__active: type == 'Áo thun' }"
-        >
-          Áo thun
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Áo khoác`)"
-          :class="{ typesort__active: type == 'Áo khoác' }"
-        >
-          Áo khoác
-        </div>
-        <div class="btn_untype" @click="unType" v-if="displayTypeFilter">
-          x
-        </div>
+        
+        <div class="btn_untype" @click="unType" v-if="displayTypeFilter">x</div>
       </div>
 
       <div class="show">
@@ -187,9 +160,6 @@
               <h4>Đã bán {{ product.numOrder }}</h4>
             </div>
           </router-link>
-          <!-- <button @click="addCart(product)" class="btn-addcart">
-            Add to cart
-          </button> -->
         </div>
       </div>
 
@@ -221,11 +191,14 @@ import axios from "axios";
 export default {
   data() {
     return {
+      listType: [],
       products: [],
       url: "http://localhost:8081/product/list?",
       search: "",
       gender: "Nữ",
-      type: "Áo",
+      categorytype: 1,
+      category: 0,
+      type: "",
       userRateFilter: 0,
       priceGT: 0,
       priceLT: 0,
@@ -243,6 +216,7 @@ export default {
 
   created() {
     this.getList();
+    this.getTypeList();
   },
 
   methods: {
@@ -292,8 +266,8 @@ export default {
       this.getList();
     },
 
-    changeType(nameType) {
-      this.type = nameType;
+    changeType(typeId) {
+      this.category = typeId;
       this.pageNumber = 1;
       this.getList();
       this.displayTypeFilter = true;
@@ -312,7 +286,7 @@ export default {
     },
 
     unType() {
-      this.type = "Áo";
+      this.category = 0;
       this.pageNumber = 1;
       this.getList();
       this.displayTypeFilter = false;
@@ -327,32 +301,46 @@ export default {
       this.displayFilter = false;
     },
 
+    async getTypeList() {
+      try {
+        const response = await axios.get(
+          "http://localhost:8081/category/list?type=1&limit=100&page=1"
+        );
+        this.listType = response.data.content;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     async getList() {
       try {
-        var string =
+        const response = await axios.get(
           this.url +
-          "search=" +
-          this.search +
-          "&gender=" +
-          this.gender +
-          "&type=" +
-          this.type +
-          "&rate=" +
-          this.userRateFilter +
-          "&pricegt=" +
-          this.priceGT +
-          "&pricelt=" +
-          this.priceLT +
-          "&limit=" +
-          this.limit +
-          "&page=" +
-          this.pageNumber +
-          "&sortby=" +
-          this.typeSort +
-          "&sort=" +
-          this.isSort;
-        console.log(string);
-        const response = await axios.get(string);
+            "search=" +
+            this.search +
+            "&gender=" +
+            this.gender +
+            "&categorytype=" +
+            this.categorytype +
+            "&category=" +
+            this.category +
+            "&type=" +
+            this.type +
+            "&rate=" +
+            this.userRateFilter +
+            "&pricegt=" +
+            this.priceGT +
+            "&pricelt=" +
+            this.priceLT +
+            "&limit=" +
+            this.limit +
+            "&page=" +
+            this.pageNumber +
+            "&sortby=" +
+            this.typeSort +
+            "&sort=" +
+            this.isSort
+        );
         this.products = response.data.content;
         this.totalPage = response.data.totalPages;
         this.totalItem = response.data.totalElements;
@@ -547,8 +535,7 @@ export default {
   border: 1px solid #c0c0c0;
   border-radius: 30px;
   line-height: 15px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin: 10px;
   transform: translateY(10px);
 }
 
@@ -663,9 +650,6 @@ export default {
   width: 100%;
   padding: 0 30px;
   height: 60px;
-  /* white-space: nowrap; Ngăn văn bản xuống dòng
-  overflow: hidden; /* Ẩn phần văn bản vượt quá chiều rộng */
-  /* text-overflow: ellipsis;  */
   margin-top: 10px;
   font-size: 25px;
   font-weight: 700;
@@ -697,13 +681,12 @@ export default {
 } */
 
 .sort__by-name {
-  width: 100px;
+  width: 120px;
   height: 40px;
   line-height: 40px;
   border: 1px solid #c0c0c0;
   border-radius: 10px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin: 10px;
 }
 
 .sort__by-name:hover {

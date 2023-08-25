@@ -1,86 +1,17 @@
 <template>
   <div class="products">
     <div class="banner"></div>
-
-    <!-- <form @submit.prevent="onSearch" class="search">
-      <input
-        type="text"
-        class="search-input"
-        placeholder="Search..."
-        v-model="search"
-        id="idsearch"
-      />
-      <button type="submit" class="search-btn">Tìm kiếm</button>
-    </form> -->
-
     <div class="grid">
       <div class="select-type">
         <div
-          class="sort__by-name"
-          @click="changeType(`Áo sơ mi`)"
-          :class="{ typesort__active: type == 'Áo sơ mi' }"
+          class="sort__by-name"  v-for="type in listType" :key="type.id"
+          @click="changeType(type.id)"
+          :class="{ typesort__active: category == type.id }"
         >
-          Áo sơ mi
+          {{ type.categoryName }}
         </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Áo thun`)"
-          :class="{ typesort__active: type == 'Áo thun' }"
-        >
-          Áo thun
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Áo khoác`)"
-          :class="{ typesort__active: type == 'Áo khoác' }"
-        >
-          Áo khoác
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Quần jean`)"
-          :class="{ typesort__active: type == 'Quần jean' }"
-        >
-          Quần jean
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Quần lửng`)"
-          :class="{ typesort__active: type == 'Quần lửng' }"
-        >
-          Quần lửng
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Quần short`)"
-          :class="{ typesort__active: type == 'Quần short' }"
-        >
-          Quần short
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Váy`)"
-          :class="{ typesort__active: type == 'Váy' }"
-        >
-          Váy
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Túi`)"
-          :class="{ typesort__active: type == 'Túi' }"
-        >
-          Túi
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeType(`Giày`)"
-          :class="{ typesort__active: type == 'Giày' }"
-        >
-          Giày
-        </div>
-        <div class="btn_untype" @click="unType" v-if="displayTypeFilter">
-          x
-        </div>
+        
+        <div class="btn_untype" @click="unType" v-if="displayTypeFilter">x</div>
       </div>
 
       <div class="show">
@@ -229,9 +160,6 @@
               <h4>Đã bán {{ product.numOrder }}</h4>
             </div>
           </router-link>
-          <!-- <button @click="addCart(product)" class="btn-addcart">
-            Add to cart
-          </button> -->
         </div>
       </div>
 
@@ -263,10 +191,13 @@ import axios from "axios";
 export default {
   data() {
     return {
+      listType: [],
       products: [],
       url: "http://localhost:8081/product/list?",
       search: "",
       gender: "",
+      categorytype: 0,
+      category: 0,
       type: "",
       userRateFilter: 0,
       priceGT: 0,
@@ -285,6 +216,7 @@ export default {
 
   created() {
     this.getList();
+    this.getTypeList();
   },
 
   methods: {
@@ -334,8 +266,8 @@ export default {
       this.getList();
     },
 
-    changeType(nameType) {
-      this.type = nameType;
+    changeType(typeId) {
+      this.category = typeId;
       this.pageNumber = 1;
       this.getList();
       this.displayTypeFilter = true;
@@ -354,7 +286,7 @@ export default {
     },
 
     unType() {
-      this.type = "";
+      this.category = 0;
       this.pageNumber = 1;
       this.getList();
       this.displayTypeFilter = false;
@@ -369,30 +301,45 @@ export default {
       this.displayFilter = false;
     },
 
+    async getTypeList() {
+      try {
+        const response = await axios.get(
+          "http://localhost:8081/category/list?type=0&limit=100&page=1"
+        );
+        this.listType = response.data.content;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     async getList() {
       try {
         const response = await axios.get(
           this.url +
-          "search=" +
-          this.search +
-          "&gender=" +
-          this.gender +
-          "&type=" +
-          this.type +
-          "&rate=" +
-          this.userRateFilter +
-          "&pricegt=" +
-          this.priceGT +
-          "&pricelt=" +
-          this.priceLT +
-          "&limit=" +
-          this.limit +
-          "&page=" +
-          this.pageNumber +
-          "&sortby=" +
-          this.typeSort +
-          "&sort=" +
-          this.isSort
+            "search=" +
+            this.search +
+            "&gender=" +
+            this.gender +
+            "&categorytype=" +
+            this.categorytype +
+            "&category=" +
+            this.category +
+            "&type=" +
+            this.type +
+            "&rate=" +
+            this.userRateFilter +
+            "&pricegt=" +
+            this.priceGT +
+            "&pricelt=" +
+            this.priceLT +
+            "&limit=" +
+            this.limit +
+            "&page=" +
+            this.pageNumber +
+            "&sortby=" +
+            this.typeSort +
+            "&sort=" +
+            this.isSort
         );
         this.products = response.data.content;
         this.totalPage = response.data.totalPages;
@@ -402,37 +349,6 @@ export default {
       }
     },
 
-    // addCart(product) {
-    //   this.shoppingCart = JSON.parse(localStorage.getItem("shoppingCart"));
-    //   if (this.shoppingCart == null) {
-    //     this.shoppingCart = [];
-    //     this.shoppingCart.push({
-    //       product: product,
-    //       quantity: 1,
-    //     });
-    //   } else {
-    //     for (let i = 0; i < this.shoppingCart.length; i++) {
-    //       if (this.shoppingCart[i].product.id == product.id) {
-    //         this.shoppingCart[i].quantity++;
-    //         localStorage.setItem(
-    //           "shoppingCart",
-    //           JSON.stringify(this.shoppingCart)
-    //         );
-    //         console.log(localStorage.getItem("shoppingCart"));
-    //         return;
-    //       }
-    //     }
-    //     this.shoppingCart.push({
-    //       product: product,
-    //       quantity: 1,
-    //     });
-    //     localStorage.setItem("shoppingCart", JSON.stringify(this.shoppingCart));
-    //     console.log(localStorage.getItem("shoppingCart"));
-    //     return;
-    //   }
-    //   localStorage.setItem("shoppingCart", JSON.stringify(this.shoppingCart));
-    //   console.log(localStorage.getItem("shoppingCart"));
-    // },
   },
 
   computed: {
@@ -588,8 +504,7 @@ export default {
   border: 1px solid #c0c0c0;
   border-radius: 30px;
   line-height: 15px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin: 10px;
   transform: translateY(10px);
 }
 
@@ -738,13 +653,12 @@ export default {
 } */
 
 .sort__by-name {
-  width: 100px;
+  width: 120px;
   height: 40px;
   line-height: 40px;
   border: 1px solid #c0c0c0;
   border-radius: 10px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin: 10px;
 }
 
 .sort__by-name:hover {

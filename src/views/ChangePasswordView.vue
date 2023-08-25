@@ -7,38 +7,39 @@
       </div>
       <div class="login-content">
         <div action="index.html">
-          <form @submit.prevent="login">
+          <form>
             <img src="../assets/img/avatar.svg" />
-            <h2 class="title">Welcome</h2>
+            <h2 class="title">Đổi mật khẩu</h2>
             <div class="input-div one">
               <div class="i">
                 <font-awesome-icon :icon="['fas', 'user']" />
               </div>
               <div class="div">
                 <input
-                  type="text"
+                  type="password"
                   class="input"
-                  placeholder="Username"
-                  v-model="username"
+                  placeholder="Nhập mật khẩu mới"
+                  v-model="password"
                 />
               </div>
             </div>
-            <div class="input-div pass">
+            <div class="input-div one">
               <div class="i">
-                <font-awesome-icon :icon="['fas', 'lock']" />
+                <font-awesome-icon :icon="['fas', 'user']" />
               </div>
               <div class="div">
                 <input
                   type="password"
                   class="input"
-                  placeholder="Password"
-                  v-model="password"
+                  placeholder="Nhập lại mật khẩu"
+                  v-model="ConfirmPassword"
                 />
               </div>
             </div>
-          <button type="submit" class="btn" @click="login">Login</button>
           </form>
-          <router-link to="/forgot">Forgot Password</router-link>
+            <button type="submit" class="btn" @click="login">
+              Đổi mật khẩu
+            </button>
         </div>
       </div>
     </div>
@@ -51,60 +52,63 @@ export default {
   data() {
     return {
       // isLogin: true,
-      username: "",
+      ConfirmPassword: "",
       password: "",
-      token: "",
       user: {},
     };
   },
   methods: {
     async login() {
+      if(this.password != this.ConfirmPassword){
+        alert("Mật khẩu không khớp");
+        return;
+      }
       try {
-        const response = await axios.post("http://localhost:8081/api/login", {
-          username: this.username,
-          password: this.password,
-        });
-        this.token = response.data.jwt;
-        localStorage.setItem("token", this.token);
-        // this.current(),
-        // this.$emit('user-sent', this.user);
-        window.location.replace("http://localhost:8080/");
-      } catch(error) {
-        alert("Tài khoản hoặc mật khẩu không đúng")
+        const response = await axios.put(
+          "http://localhost:8081/user/update/" + this.user.id,
+          {
+            username: this.user.username,
+            email: this.user.email,
+            password: this.password,
+            roles: this.user.roles,
+            firstName: this.user.firstName,
+            lastName: this.user.lastName,
+            phone: this.user.phone,
+            address: this.user.address,
+            userInfoEntity: this.user.userInfoEntity
+          },
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              Authorization: "Bearer " + this.$route.params.token,
+            },
+          }
+        );
+        alert("Đổi mật khẩu thành công");
+        this.$router.push("/login");
+        return response;
+      } catch (error) {
+        alert("Tài khoản hoặc mật khẩu không đúng");
       }
     },
-    
+
     async current() {
       try {
         const response = await axios.get("http://localhost:8081/api/current", {
           headers: {
             "Access-Control-Allow-Origin": "*",
-            Authorization: "Bearer " + localStorage.getItem("token"),
+            Authorization: "Bearer " + this.$route.params.token,
           },
         });
         this.user = response.data.userEntity;
-        return this.user;
+        return response.data.userEntity;
       } catch (error) {
         console.error(error);
       }
     },
-
-    // },
-    // async getRandom() {
-    //   try {
-    //     const response = await axios.get("http://localhost:8081/api/random", {
-    //       headers: {
-    //         Authorization: "Bearer " + localStorage.getItem("token"),
-    //       },
-    //     });
-    //     console.log(response);
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // },
-    // sendMessage() {
-    //   this.$emit('message-sent', 'Hello from child');
-    // }
+  },
+  async created() {
+    this.user = await this.current();
   },
 };
 </script>
@@ -177,6 +181,13 @@ form {
   margin: 25px 0;
   padding: 5px 0;
   border-bottom: 2px solid #d9d9d9;
+}
+
+.lable {
+  width: 100%;
+  font-size: 20px;
+  text-align: left;
+  font-weight: 500;
 }
 
 .login-content .input-div.one {

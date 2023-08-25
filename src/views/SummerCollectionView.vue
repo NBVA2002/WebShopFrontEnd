@@ -1,146 +1,7 @@
 <template>
   <div class="products">
-    <div class="banner"></div>
+    <div class="banner">BỘ SƯU TẬP HÈ 2023</div>
     <div class="grid">
-      <div class="select-type">
-        <div
-          class="sort__by-name"  v-for="type in listType" :key="type.id"
-          @click="changeType(type.id)"
-          :class="{ typesort__active: category == type.id }"
-        >
-          {{ type.categoryName }}
-        </div>
-        
-        <div class="btn_untype" @click="unType" v-if="displayTypeFilter">x</div>
-      </div>
-
-      <div class="show">
-        <select
-          class="combo-box__size"
-          v-model="limit"
-          @change="changePageLimit(limit)"
-        >
-          <option v-for="k in records" :key="k.key" :value="k.key">
-            {{ k.value }}
-          </option>
-        </select>
-        <div
-          class="sort__by-name"
-          @click="changeTypeSort(`id`)"
-          :class="{ typesort__active: typeSort == 'id' }"
-        >
-          Mới
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeTypeSort(`productName`)"
-          :class="{ typesort__active: typeSort == 'productName' }"
-        >
-          Tên
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeTypeSort(`price`)"
-          :class="{ typesort__active: typeSort == 'price' }"
-        >
-          Giá
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeTypeSort(`rate`)"
-          :class="{ typesort__active: typeSort == 'rate' }"
-        >
-          Sao
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeTypeSort(`numEvaluate`)"
-          :class="{ typesort__active: typeSort == 'numEvaluate' }"
-        >
-          Lượt đánh giá
-        </div>
-        <div
-          class="sort__by-name"
-          @click="changeTypeSort(`numOrder`)"
-          :class="{ typesort__active: typeSort == 'numOrder' }"
-        >
-          Lượt mua
-        </div>
-
-        <div class="change__sort-arr" @click="sortChange">
-          <font-awesome-icon
-            :icon="['fas', 'sort-up']"
-            class="sort-arr"
-            :class="{ sort__active: isSort == 'asc' }"
-          />
-          <font-awesome-icon
-            :icon="['fas', 'sort-down']"
-            class="sort-arr"
-            :class="{ sort__active: isSort == 'desc' }"
-          />
-        </div>
-
-        <font-awesome-icon
-          :icon="['fas', 'filter']"
-          class="filter"
-          @click="openFilter"
-        />
-        <div class="filter-list" v-if="displayFilter">
-          <form>
-            <div>Lọc giá trong khoảng</div>
-            Từ&nbsp;&nbsp;&nbsp;<input
-              type="text"
-              class="input-filter"
-              v-model="priceGT"
-            />
-            Đến
-            <input type="text" class="input-filter" v-model="priceLT" />
-            <br />
-            <br />
-            <div>Đánh giá từ</div>
-            <div class="rate-star">
-              <font-awesome-icon
-                :icon="['fas', 'star']"
-                class="star"
-                :class="{ 'star-active': userRateFilter == 1 }"
-                @click="userRateStar(1)"
-              />
-              <font-awesome-icon
-                :icon="['fas', 'star']"
-                class="star"
-                :class="{ 'star-active': userRateFilter == 2 }"
-                @click="userRateStar(2)"
-              />
-              <font-awesome-icon
-                :icon="['fas', 'star']"
-                class="star"
-                :class="{ 'star-active': userRateFilter == 3 }"
-                @click="userRateStar(3)"
-              />
-              <font-awesome-icon
-                :icon="['fas', 'star']"
-                class="star"
-                :class="{ 'star-active': userRateFilter == 4 }"
-                @click="userRateStar(4)"
-              />
-              <font-awesome-icon
-                :icon="['fas', 'star']"
-                class="star"
-                :class="{ 'star-active': userRateFilter == 5 }"
-                @click="userRateStar(5)"
-              />
-            </div>
-            <div>trở lên</div>
-          </form>
-          <button class="filter-btn" @click="filter">Lọc</button>
-          <button class="unfilter-btn" @click="unfilter">Hủy Lọc</button>
-        </div>
-      </div>
-
-      <div class="pagination__left">
-        <span>Tìm thấy {{ totalItem }} kết quả : </span>
-      </div>
-
       <div class="list-item">
         <div class="item" v-for="product in products" :key="product.id">
           <router-link
@@ -160,6 +21,9 @@
               <h4>Đã bán {{ product.numOrder }}</h4>
             </div>
           </router-link>
+          <!-- <button @click="addCart(product)" class="btn-addcart">
+            Add to cart
+          </button> -->
         </div>
       </div>
 
@@ -191,14 +55,13 @@ import axios from "axios";
 export default {
   data() {
     return {
-      listType: [],
       products: [],
       url: "http://localhost:8081/product/list?",
       search: "",
-      gender: "Nữ",
-      categorytype: 2,
+      gender: "",
+      categorytype: 0,
       category: 0,
-      type: "",
+      type: "Summer",
       userRateFilter: 0,
       priceGT: 0,
       priceLT: 0,
@@ -207,7 +70,7 @@ export default {
       totalItem: 0,
       totalPage: 0,
       pageNumber: 1,
-      limit: 12,
+      limit: 8,
       shoppingCart: [],
       displayFilter: false,
       displayTypeFilter: false,
@@ -286,7 +149,7 @@ export default {
     },
 
     unType() {
-      this.category = 0;
+      this.type = "";
       this.pageNumber = 1;
       this.getList();
       this.displayTypeFilter = false;
@@ -304,7 +167,7 @@ export default {
     async getTypeList() {
       try {
         const response = await axios.get(
-          "http://localhost:8081/category/list?type=2&limit=100&page=1"
+          "http://localhost:8081/category/list?type=0&limit=100&page=1"
         );
         this.listType = response.data.content;
       } catch (error) {
@@ -348,38 +211,6 @@ export default {
         console.error(error);
       }
     },
-
-    // addCart(product) {
-    //   this.shoppingCart = JSON.parse(localStorage.getItem("shoppingCart"));
-    //   if (this.shoppingCart == null) {
-    //     this.shoppingCart = [];
-    //     this.shoppingCart.push({
-    //       product: product,
-    //       quantity: 1,
-    //     });
-    //   } else {
-    //     for (let i = 0; i < this.shoppingCart.length; i++) {
-    //       if (this.shoppingCart[i].product.id == product.id) {
-    //         this.shoppingCart[i].quantity++;
-    //         localStorage.setItem(
-    //           "shoppingCart",
-    //           JSON.stringify(this.shoppingCart)
-    //         );
-    //         console.log(localStorage.getItem("shoppingCart"));
-    //         return;
-    //       }
-    //     }
-    //     this.shoppingCart.push({
-    //       product: product,
-    //       quantity: 1,
-    //     });
-    //     localStorage.setItem("shoppingCart", JSON.stringify(this.shoppingCart));
-    //     console.log(localStorage.getItem("shoppingCart"));
-    //     return;
-    //   }
-    //   localStorage.setItem("shoppingCart", JSON.stringify(this.shoppingCart));
-    //   console.log(localStorage.getItem("shoppingCart"));
-    // },
   },
 
   computed: {
@@ -430,14 +261,21 @@ export default {
   border-radius: 10px;
 }
 
-.banner {
-  background-image: url("../assets/images/banner/quan-nu-routine-min.jpg");
+.products {
+  background-image: url("../assets/images/banner/Screenshot 2023-08-22 193443.png");
   width: 100%;
-  height: 400px;
+  height: 1440px;
   /* background-repeat: no-repeat; */
   background-size: cover;
   background-position: center;
   margin-bottom: 20px;
+}
+
+.banner {
+  padding: 30px;
+  color: #22ff00;
+  font-size: 50px;
+  font-weight: 700;
 }
 
 .combo-box__size {
@@ -535,7 +373,8 @@ export default {
   border: 1px solid #c0c0c0;
   border-radius: 30px;
   line-height: 15px;
-  margin: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
   transform: translateY(10px);
 }
 
@@ -630,7 +469,7 @@ export default {
 
 .item-link {
   text-decoration: none;
-  color: black;
+  color: #22ff00;
   width: 100%;
 }
 
@@ -650,6 +489,9 @@ export default {
   width: 100%;
   padding: 0 30px;
   height: 60px;
+  /* white-space: nowrap; Ngăn văn bản xuống dòng
+  overflow: hidden; /* Ẩn phần văn bản vượt quá chiều rộng */
+  /* text-overflow: ellipsis;  */
   margin-top: 10px;
   font-size: 25px;
   font-weight: 700;
@@ -681,12 +523,13 @@ export default {
 } */
 
 .sort__by-name {
-  width: 120px;
+  width: 100px;
   height: 40px;
   line-height: 40px;
   border: 1px solid #c0c0c0;
   border-radius: 10px;
-  margin: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .sort__by-name:hover {

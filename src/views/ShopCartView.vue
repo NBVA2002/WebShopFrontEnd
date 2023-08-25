@@ -70,6 +70,8 @@ export default {
     };
   },
 
+  props: ["islogin", "isAdmin"],
+
   created() {
     if (
       JSON.parse(localStorage.getItem("shoppingCart")) == null ||
@@ -126,19 +128,24 @@ export default {
     },
 
     async sendOrder() {
-      this.orderId = await this.createOder();
-      console.log(this.orderId);
-      for (var i = 0; i < this.shoppingCart.length; i++) {
-        this.addCartItemOder(
-          this.shoppingCart[i].product.id,
-          this.shoppingCart[i].size,
-          this.shoppingCart[i].quantity
-        );
-        console.log(this.shoppingCart[i].product.id);
+      if (this.islogin) {
+        this.orderId = await this.createOder();
+        console.log(this.orderId);
+        for (var i = 0; i < this.shoppingCart.length; i++) {
+          this.addCartItemOder(
+            this.shoppingCart[i].product.id,
+            this.shoppingCart[i].size,
+            this.shoppingCart[i].quantity
+          );
+          console.log(this.shoppingCart[i].product.id);
+        }
+        localStorage.removeItem("shoppingCart");
+        alert("Đặt hàng thành công");
+        this.$router.push("/user");
+      } else {
+        alert("Bạn chưa đăng nhập");
+        this.$router.push("/login");
       }
-      localStorage.removeItem("shoppingCart");
-      alert("Đặt hàng thành công");
-      this.$router.push("/user");
     },
 
     async createOder() {
