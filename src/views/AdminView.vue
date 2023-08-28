@@ -883,6 +883,7 @@ export default {
           "http://localhost:8081/order/update/" + order.id,
           {
             userInfoEntity: order.userInfoEntity,
+            orderDate: order.orderDate,
             totalPrice: order.totalPrice,
             hasProcess: order.hasProcess,
           },
