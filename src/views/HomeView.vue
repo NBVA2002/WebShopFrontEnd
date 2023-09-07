@@ -43,7 +43,7 @@
                 >
                   <img
                     :src="
-                      'http://localhost:8081/file/' +
+                      this.urlbe + '/file/' +
                       product.imageEntities[0].imgURL
                     "
                     alt=""
@@ -72,7 +72,7 @@
         <router-link to="/women" class="gender-view women-view"></router-link>
       </div>
     </div>
-      <div class="grid new-product" style="margin-top: 40px">
+      <div class="grid new-product" style="margin-top: 40px; margin-bottom: 10px">
         <h1>Bộ sưu tập mới</h1>
 <router-link to="/collection/summercollection" class="banner banner1"></router-link>
       </div>
@@ -110,7 +110,7 @@ export default {
       ],
       modules: [Autoplay, Pagination],
       products: [],
-      url: "http://localhost:8081/product/list?",
+      url: this.urlbe + "/product/list?",
       search: "",
       gender: "",
       categorytype: 0,
@@ -127,6 +127,8 @@ export default {
       limit: 4,
     };
   },
+
+  props: ["islogin", "isAdmin", "urlbe"],
 
   methods: {
     formatPrice(number) {

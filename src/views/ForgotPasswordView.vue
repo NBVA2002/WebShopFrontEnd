@@ -23,8 +23,10 @@
                 />
               </div>
             </div>
-          
-          <button type="submit" class="btn" @click="login">Lấy lại mật khẩu</button>
+
+            <button type="submit" class="btn" @click="login">
+              Lấy lại mật khẩu
+            </button>
           </form>
         </div>
       </div>
@@ -44,17 +46,21 @@ export default {
       user: {},
     };
   },
+
+  props: ["islogin", "isAdmin", "urlbe"],
+
   methods: {
     async login() {
       try {
-        const response = await axios.post("http://localhost:8081/mail/forgot?username="+this.username);
-        alert("Kiểm tra email để lấy lại mật khẩu");  
+        const response = await axios.post(
+          this.urlbe + "/mail/forgot?username=" + this.username
+        );
+        alert("Kiểm tra email để lấy lại mật khẩu");
         return response.data;
-      } catch(error) {
-        alert("Tài khoản không tồn tại")
+      } catch (error) {
+        alert("Tài khoản không tồn tại");
       }
     },
-    
   },
 };
 </script>

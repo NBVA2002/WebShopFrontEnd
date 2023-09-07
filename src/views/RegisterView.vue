@@ -209,9 +209,12 @@ export default {
       user: {},
     };
   },
+  
+    props: ["islogin", "isAdmin", "urlbe"],
+
   methods: {
     async login() {
-      const response = await axios.post("http://localhost:8081/api/login", {
+      const response = await axios.post(this.urlbe + "/api/login", {
         username: this.username,
         password: this.password,
       });
@@ -244,7 +247,7 @@ export default {
     // },
     // async current() {
     //   try {
-    //     const response = await axios.get("http://localhost:8081/api/current", {
+    //     const response = await axios.get(this.urlbe + "/api/current", {
     //       headers:{
     //         'Access-Control-Allow-Origin': '*',
     //         'Authorization': 'Bearer ' + localStorage.getItem('token'),
@@ -259,7 +262,7 @@ export default {
     // },
     // async getRandom() {
     //   try {
-    //     const response = await axios.get("http://localhost:8081/api/random", {
+    //     const response = await axios.get(this.urlbe + "/api/random", {
     //       headers: {
     //         Authorization: "Bearer " + localStorage.getItem("token"),
     //       },

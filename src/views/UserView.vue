@@ -164,7 +164,7 @@
             >
               <img
                 :src="
-                  'http://localhost:8081/file/' +
+                  this.urlbe + '/file/' +
                   cartItem.productEntity.imageEntities[0].imgURL
                 "
                 alt=""
@@ -241,7 +241,7 @@ export default {
     };
   },
 
-  props: ["islogin", "isAdmin"],
+  props: ["islogin", "isAdmin", "urlbe"],
 
   methods: {
     logout() {
@@ -322,7 +322,7 @@ export default {
 
     async current() {
       try {
-        const response = await axios.get("http://localhost:8081/api/current", {
+        const response = await axios.get(this.urlbe + "/api/current", {
           headers: {
             "Access-Control-Allow-Origin": "*",
             Authorization: "Bearer " + localStorage.getItem("token"),
@@ -338,7 +338,7 @@ export default {
     async getListOrder() {
       try {
         const response = await axios.get(
-          "http://localhost:8081/order/list/" +
+          this.urlbe + "/order/list/" +
             this.user.id +
             "?limit=1&page=" +
             this.pageNumber +

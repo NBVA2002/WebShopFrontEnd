@@ -10,7 +10,7 @@
           >
             <img
               :src="
-                'http://localhost:8081/file/' +
+                this.urlbe + '/file/' +
                 cartegoryItem.product.imageEntities[0].imgURL
               "
               alt=""
@@ -70,7 +70,7 @@ export default {
     };
   },
 
-  props: ["islogin", "isAdmin"],
+    props: ["islogin", "isAdmin", "urlbe"],
 
   created() {
     if (
@@ -151,7 +151,7 @@ export default {
     async createOder() {
       try {
         const response = await axios.post(
-          "http://localhost:8081/order/create",
+          this.urlbe + "/order/create",
           {},
           {
             headers: {
@@ -169,7 +169,7 @@ export default {
     async addCartItemOder(pid, size, quantity) {
       try {
         const response = await axios.post(
-          "http://localhost:8081/cart/create/" + this.orderId + "?pid=" + pid,
+          this.urlbe + "/cart/create/" + this.orderId + "?pid=" + pid,
           {
             size: size,
             quantity: quantity,

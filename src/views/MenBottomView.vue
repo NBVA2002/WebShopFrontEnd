@@ -149,7 +149,7 @@
           >
             <img
               :src="
-                'http://localhost:8081/file/' + product.imageEntities[0].imgURL
+                this.urlbe + '/file/' + product.imageEntities[0].imgURL
               "
               alt=""
               class="item-img"
@@ -193,7 +193,7 @@ export default {
     return {
       listType: [],
       products: [],
-      url: "http://localhost:8081/product/list?",
+      url: this.urlbe + "/product/list?",
       search: "",
       gender: "Nam",
       categorytype: 2,
@@ -213,6 +213,8 @@ export default {
       displayTypeFilter: false,
     };
   },
+  
+    props: ["islogin", "isAdmin", "urlbe"],
 
   created() {
     this.getList();
@@ -304,7 +306,7 @@ export default {
     async getTypeList() {
       try {
         const response = await axios.get(
-          "http://localhost:8081/category/list?type=2&limit=100&page=1"
+          this.urlbe + "/category/list?type=2&limit=100&page=1"
         );
         this.listType = response.data.content;
       } catch (error) {

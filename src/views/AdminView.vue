@@ -5,35 +5,35 @@
         <div class="dashboard-avt">Hello {{ user.lastName }}</div>
         <div
           class="dashboard-item"
-          @click="dashboardItemSelect(1, 'http://localhost:8081/product/list?')"
+          @click="dashboardItemSelect(1, this.urlbe + '/product/list?')"
           :class="{ 'dashboard-item__active': dashboardSelect == 1 }"
         >
           <font-awesome-icon :icon="['fas', 'user']" />Quản lý
         </div>
         <div
           class="dashboard-item"
-          @click="dashboardItemSelect(2, 'http://localhost:8081/product/list?')"
+          @click="dashboardItemSelect(2, this.urlbe + '/product/list?')"
           :class="{ 'dashboard-item__active': dashboardSelect == 2 }"
         >
           <font-awesome-icon :icon="['fas', 'bag-shopping']" /> Sản phẩm
         </div>
         <div
           class="dashboard-item"
-          @click="dashboardItemSelect(3, 'http://localhost:8081/product/list?')"
+          @click="dashboardItemSelect(3, this.urlbe + '/product/list?')"
           :class="{ 'dashboard-item__active': dashboardSelect == 3 }"
         >
           <font-awesome-icon :icon="['fas', 'bars']" />Danh mục
         </div>
         <div
           class="dashboard-item"
-          @click="dashboardItemSelect(4, 'http://localhost:8081/order/list?')"
+          @click="dashboardItemSelect(4, this.urlbe + '/order/list?')"
           :class="{ 'dashboard-item__active': dashboardSelect == 4 }"
         >
           <font-awesome-icon :icon="['fas', 'credit-card']" />Đơn hàng
         </div>
         <div
           class="dashboard-item"
-          @click="dashboardItemSelect(5, 'http://localhost:8081/user/list?')"
+          @click="dashboardItemSelect(5, this.urlbe + '/user/list?')"
           :class="{ 'dashboard-item__active': dashboardSelect == 5 }"
         >
           <font-awesome-icon :icon="['fas', 'users']" />Tài khoản
@@ -196,7 +196,7 @@
                 <td>
                   <img
                     :src="
-                      'http://localhost:8081/file/' +
+                      urlbe + '/file/' +
                       product.imageEntities[0].imgURL
                     "
                     alt=""
@@ -591,7 +591,7 @@ export default {
     };
   },
 
-  props: ["islogin", "isAdmin", "user"],
+    props: ["islogin", "isAdmin", "user", "urlbe"],
 
   methods: {
     logout() {
@@ -624,7 +624,7 @@ export default {
       formdata.append("pid", pid);
       try {
         const response = await axios.post(
-          "http://localhost:8081/file/upload",
+          this.urlbe + "/file/upload",
           formdata,
           {
             headers: {
@@ -652,7 +652,7 @@ export default {
       ) {
         try {
           const response = await axios.post(
-            "http://localhost:8081/product/create",
+            this.urlbe + "/product/create",
             {
               productName: this.newProduct.productName,
               category: this.newProduct.category,
@@ -725,7 +725,7 @@ export default {
     async updateProduct(product) {
       try {
         const response = await axios.put(
-          "http://localhost:8081/product/update/" + product.id,
+          this.urlbe + "/product/update/" + product.id,
           {
             productName: product.productName,
             category: product.category,
@@ -753,7 +753,7 @@ export default {
     async deleteProduct(id) {
       try {
         const response = await axios.delete(
-          "http://localhost:8081/product/delete/" + id,
+          this.urlbe + "/product/delete/" + id,
           {
             headers: {
               "Access-Control-Allow-Origin": "*",
@@ -772,7 +772,7 @@ export default {
     async getListCategory(type) {
       try {
         const response = await axios.get(
-          "http://localhost:8081/category/list?type=" +
+          this.urlbe + "/category/list?type=" +
             type +
             "&limit=100&page=1"
         );
@@ -786,7 +786,7 @@ export default {
       if (this.newCategory != "") {
         try {
           const response = await axios.post(
-            "http://localhost:8081/category/create",
+            this.urlbe + "/category/create",
             {
               categoryName: this.newCategory,
               categoryType: type,
@@ -819,7 +819,7 @@ export default {
     async getListOrder() {
       // try {
       //   const response = await axios.get(
-      //     "http://localhost:8081/order/list/" +
+      //     this.urlbe + "/order/list/" +
       //       this.user.id +
       //       "?limit=1&page=" +
       //       this.pageNumber +
@@ -880,7 +880,7 @@ export default {
       console.log(order);
       try {
         const response = await axios.put(
-          "http://localhost:8081/order/update/" + order.id,
+          this.urlbe + "/order/update/" + order.id,
           {
             userInfoEntity: order.userInfoEntity,
             orderDate: order.orderDate,
@@ -895,7 +895,7 @@ export default {
           }
         );
         const response2 = await axios.post(
-          "http://localhost:8081/mail/success/" + order.id,
+          this.urlbe + "/mail/success/" + order.id,
           {
             headers: {
               "Access-Control-Allow-Origin": "*",
@@ -914,7 +914,7 @@ export default {
 
     async getToTalPrice() {
       try {
-        const response = await axios.get("http://localhost:8081/order/total", {
+        const response = await axios.get(this.urlbe + "/order/total", {
           headers: {
             "Access-Control-Allow-Origin": "*",
             Authorization: "Bearer " + localStorage.getItem("token"),
@@ -929,7 +929,7 @@ export default {
     async getToTalByMonth(fromDate, toDate) {
       try {
         const response = await axios.get(
-          "http://localhost:8081/order/listdate?from=" + fromDate +"&to=" + toDate,
+          this.urlbe + "/order/listdate?from=" + fromDate +"&to=" + toDate,
           {
             headers: {
               "Access-Control-Allow-Origin": "*",
@@ -1011,12 +1011,12 @@ export default {
     if (!this.isAdmin || !this.islogin) {
       this.$router.push("/404");
     } else {
-      this.url = "http://localhost:8081/user/list?";
+      this.url = this.urlbe + "/user/list?";
       this.users = await this.getListUser();
       this.categories = await this.getListCategory(0);
-      this.url = "http://localhost:8081/product/list?";
+      this.url = this.urlbe + "/product/list?";
       this.products = this.getListProduct();
-      this.url = "http://localhost:8081/order/list?";
+      this.url = this.urlbe + "/order/list?";
       this.order = await this.getListAllOrder();
       this.url = "";
 
@@ -1286,6 +1286,7 @@ export default {
 
 .sales {
   margin-top: 20px;
+  margin-left: 20px;
   padding: 10px;
   width: 300px;
   height: 150px;

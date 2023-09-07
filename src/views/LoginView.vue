@@ -7,7 +7,7 @@
       </div>
       <div class="login-content">
         <div action="index.html">
-          <form @submit.prevent="login">
+          <form @submit.prevent="checkAcountUser">
             <img src="../assets/img/avatar.svg" />
             <h2 class="title">Welcome</h2>
             <div class="input-div one">
@@ -36,9 +36,12 @@
                 />
               </div>
             </div>
-          <button type="submit" class="btn" @click="login">Login</button>
+            <button type="submit" class="btn" @click="checkAcountUser">Login</button>
           </form>
+          <div style="display: flex; justify-content: space-between">
+          <router-link to="/register">Register</router-link>
           <router-link to="/forgot">Forgot Password</router-link>
+          </div>
         </div>
       </div>
     </div>
@@ -50,37 +53,33 @@ import axios from "axios";
 export default {
   data() {
     return {
-      // isLogin: true,
       username: "",
       password: "",
       token: "",
       user: {},
     };
   },
+
+    props: ["islogin", "isAdmin", "urlbe"],
+
   methods: {
     async login() {
       try {
-        const response = await axios.post("http://localhost:8081/api/login", {
+        const response = await axios.post(this.urlbe + "/api/login", {
           username: this.username,
           password: this.password,
         });
         this.token = response.data.jwt;
         localStorage.setItem("token", this.token);
-        // this.current(),
-        // this.$emit('user-sent', this.user);
         window.location.replace("http://localhost:8080/");
-      } catch(error) {
-        alert("Tài khoản hoặc mật khẩu không đúng")
+      } catch (error) {
+        alert("Mật khẩu không đúng");
       }
     },
-    
+
     async current() {
       try {
-        const response = await axios.get("http://localhost:8081/api/current", {
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
+        const response = await axios.get(this.urlbe + "/api/current", {
         });
         this.user = response.data.userEntity;
         return this.user;
@@ -89,10 +88,28 @@ export default {
       }
     },
 
+    async checkAcountUser() {
+      try {
+        const response = await axios.get(
+          this.urlbe + "/user/checkusername?username=" + this.username, {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+          },
+        });
+        if(response.data == true){
+          this.login()
+        } else {
+          alert("Tài khoản không tồn tại");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     // },
     // async getRandom() {
     //   try {
-    //     const response = await axios.get("http://localhost:8081/api/random", {
+    //     const response = await axios.get(this.urlbe + "/api/random", {
     //       headers: {
     //         Authorization: "Bearer " + localStorage.getItem("token"),
     //       },
@@ -105,6 +122,10 @@ export default {
     // sendMessage() {
     //   this.$emit('message-sent', 'Hello from child');
     // }
+  },
+
+  created() {
+    
   },
 };
 </script>

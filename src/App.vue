@@ -5,12 +5,14 @@
       :islogin="isLogin"
       :isAdmin="adminCheck()"
       :user="userCurrent"
+      :urlbe="url"
     />
     <router-view
       class="view"
       :islogin="isLogin"
       :isAdmin="adminCheck()"
       :user="userCurrent"
+      :urlbe="url"
     />
     <footer-place class="footer" />
   </div>
@@ -31,6 +33,7 @@ export default {
     return {
       isLogin: false,
       isAdmin: false,
+      url: "http://localhost:8081",
       userCurrent: {},
     };
   },
@@ -71,6 +74,7 @@ export default {
         console.error(error);
       }
     },
+
   },
 };
 </script>

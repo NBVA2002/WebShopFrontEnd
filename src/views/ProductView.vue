@@ -3,19 +3,19 @@
     <div v-if="product.imageEntities" class="product-view grid">
       <div class="img-select">
         <img
-          :src="'http://localhost:8081/file/' + product.imageEntities[0].imgURL"
+          :src="urlbe + '/file/' + product.imageEntities[0].imgURL"
           alt=""
           class="img-select__img"
           @click="imgNumber = 0"
         />
         <img
-          :src="'http://localhost:8081/file/' + product.imageEntities[1].imgURL"
+          :src="urlbe + '/file/' + product.imageEntities[1].imgURL"
           alt=""
           class="img-select__img"
           @click="imgNumber = 1"
         />
         <img
-          :src="'http://localhost:8081/file/' + product.imageEntities[2].imgURL"
+          :src="urlbe + '/file/' + product.imageEntities[2].imgURL"
           alt=""
           class="img-select__img"
           @click="imgNumber = 2"
@@ -23,7 +23,7 @@
       </div>
       <img
         :src="
-          'http://localhost:8081/file/' +
+          urlbe + '/file/' +
           product.imageEntities[imgNumber].imgURL
         "
         alt=""
@@ -208,7 +208,7 @@ export default {
     };
   },
 
-  props: ["islogin", "isAdmin", "user"],
+  props: ["islogin", "isAdmin", "user", "urlbe"],
 
   created() {
     this.getProduct();
@@ -256,7 +256,7 @@ export default {
     async getProduct() {
       try {
         const response = await axios.get(
-          "http://localhost:8081/product/list/" + this.$route.params.id
+          this.urlbe + "/product/list/" + this.$route.params.id
         );
         this.product = response.data;
         this.comments = response.data.evaluateEntities;
@@ -330,7 +330,7 @@ export default {
       }
       try {
         const response = await axios.post(
-          "http://localhost:8081/evaluate/create/" + this.$route.params.id,
+          this.urlbe + "/evaluate/create/" + this.$route.params.id,
           {
             rate: this.userRate,
             comment: this.comment,

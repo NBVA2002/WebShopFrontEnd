@@ -57,6 +57,9 @@ export default {
       user: {},
     };
   },
+
+    props: ["islogin", "isAdmin", "urlbe"],
+
   methods: {
     async login() {
       if(this.password != this.ConfirmPassword){
@@ -65,7 +68,7 @@ export default {
       }
       try {
         const response = await axios.put(
-          "http://localhost:8081/user/update/" + this.user.id,
+          this.urlbe + "/user/update/" + this.user.id,
           {
             username: this.user.username,
             email: this.user.email,
@@ -94,7 +97,7 @@ export default {
 
     async current() {
       try {
-        const response = await axios.get("http://localhost:8081/api/current", {
+        const response = await axios.get(this.urlbe + "/api/current", {
           headers: {
             "Access-Control-Allow-Origin": "*",
             Authorization: "Bearer " + this.$route.params.token,
