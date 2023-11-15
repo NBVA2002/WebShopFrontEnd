@@ -110,6 +110,12 @@ const routes = [
       import("../views/AccessoriesView.vue"),
   },
   {
+    path: "/sale",
+    name: "sale",
+    component: () =>
+      import("../views/SaleView.vue"),
+  },
+  {
     path: "/collection",
     name: "collection",
     component: () =>
@@ -120,6 +126,12 @@ const routes = [
     name: "summercollection",
     component: () =>
       import("../views/SummerCollectionView.vue"),
+  },
+  {
+    path: "/nofication",
+    name: "nofication",
+    component: () =>
+      import("../views/NoficationView.vue"),
   },
   {
     path: "/user",

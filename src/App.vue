@@ -62,13 +62,13 @@ export default {
 
     async current() {
       try {
-        const response = await axios.get("http://localhost:8081/api/current", {
+        const response = await axios.get("http://localhost:8762/auth/current", {
           headers: {
             "Access-Control-Allow-Origin": "*",
             Authorization: "Bearer " + localStorage.getItem("token"),
           },
         });
-        this.userCurrent = response.data.userEntity;
+        this.userCurrent = response.data;
         return this.userCurrent;
       } catch (error) {
         console.error(error);

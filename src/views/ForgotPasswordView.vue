@@ -7,7 +7,7 @@
       </div>
       <div class="login-content">
         <div action="index.html">
-          <form @submit.prevent="login">
+          <form @submit.prevent="submitForm">
             <img src="../assets/img/avatar.svg" />
             <h2 class="title">Quên mật khẩu</h2>
             <div class="input-div one">
@@ -22,11 +22,12 @@
                   v-model="username"
                 />
               </div>
+              <span v-if="errors.username">
+                {{ errors.username }}
+              </span>
             </div>
 
-            <button type="submit" class="btn" @click="login">
-              Lấy lại mật khẩu
-            </button>
+            <button type="submit" class="btn">Lấy lại mật khẩu</button>
           </form>
         </div>
       </div>
@@ -44,12 +45,26 @@ export default {
       password: "",
       token: "",
       user: {},
+      errors: {},
     };
   },
 
   props: ["islogin", "isAdmin", "urlbe"],
 
   methods: {
+    async submitForm() {
+      this.errors = {};
+
+      if (this.username == "") {
+        this.errors.username = "Username is required.";
+      } else if (!await this.checkAcountUser()) {
+        this.errors.username = "Username not exists.";
+      }
+
+      if (Object.keys(this.errors).length === 0) {
+        await this.login();
+      }
+    },
     async login() {
       try {
         const response = await axios.post(
@@ -59,6 +74,21 @@ export default {
         return response.data;
       } catch (error) {
         alert("Tài khoản không tồn tại");
+      }
+    },
+    async checkAcountUser() {
+      try {
+        const response = await axios.get(
+          this.urlbe + "/user/checkusername?username=" + this.username,
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          }
+        );
+        return response.data;
+      } catch (error) {
+        console.error(error);
       }
     },
   },
@@ -160,6 +190,13 @@ form {
 .input-div > div {
   position: relative;
   height: 45px;
+}
+
+.input-div span {
+  bottom: 0;
+  left: 1;
+  position: absolute;
+  color: red;
 }
 
 .input-div > div > h5 {

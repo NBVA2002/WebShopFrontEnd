@@ -22,16 +22,25 @@
         />
       </div>
       <img
-        :src="
-          urlbe + '/file/' +
-          product.imageEntities[imgNumber].imgURL
-        "
+        :src="urlbe + '/file/' + product.imageEntities[imgNumber].imgURL"
         alt=""
         class="img-product"
       />
       <div class="product-info">
-        <h2 class="products-name">{{ product.productName }}</h2>
+        <h2 class="products-name">
+          {{ product.productName }}
+          <div class="sale" v-if="product.discount > 0">
+            <img
+              src="../assets/images/features/—Pngtree—sale_146155.png"
+              alt=""
+              class=""
+              style="width: 100px; height: 100px;"
+            />
+            {{product.discount}}%
+            </div>
+          </h2>
         <h1 class="products-price">{{ formatPrice(product.price) }}</h1>
+        <h2 class="products-price" v-if="product.discount > 0" style="color: red; font-weight: 700">{{ formatPrice(product.price * (100 - product.discount)/100) }}</h2>
         <h3 class="">Chọn size</h3>
         <div class="size-select">
           <div
@@ -104,7 +113,21 @@
         <div class="content">Đánh giá sản phẩm</div>
         <div class="comment">
           <div class="user-comment">
-            <div class="username">{{user.lastName}}</div>
+            <div class="username">
+              <img
+                :src="this.urlbe + '/file/' + user.avatarUrl"
+                alt=""
+                class="avt-img"
+                v-if="user.avatarUrl != null"
+              />
+              <img
+                src="../assets/images/people/143086968_2856368904622192_1959732218791162458_n.png"
+                alt=""
+                class="avt-img"
+                v-if="user.avatarUrl == null"
+              />
+              {{ user.lastName }}
+            </div>
             <div class="rate-star">
               <font-awesome-icon
                 :icon="['fas', 'star']"
@@ -165,6 +188,18 @@
             >
               <div class="comment-item__user">
                 <div class="comment-item__user-name">
+                  <img
+                    :src="this.urlbe + '/file/' + comment.userInfoEntity.avatarUrl"
+                    alt=""
+                    class="avt-img"
+                    v-if="comment.userInfoEntity.avatarUrl != null"
+                  />
+                  <img
+                    src="../assets/images/people/143086968_2856368904622192_1959732218791162458_n.png"
+                    alt=""
+                    class="avt-img"
+                    v-if="comment.userInfoEntity.avatarUrl == null"
+                  />
                   {{ comment.userInfoEntity.firstName }}
                   {{ comment.userInfoEntity.lastName }}
                 </div>
@@ -182,6 +217,7 @@
                 <div class="comment-item__get-comment">
                   {{ comment.comment }}
                 </div>
+                <button v-if="isAdmin" style="margin: 10px" @click="deleteEvaluate(comment.id)">Xóa đánh giá này</button>
               </div>
             </div>
           </div>
@@ -350,6 +386,26 @@ export default {
         console.error(error);
       }
     },
+
+    async deleteEvaluate(id) {
+      try {
+        const response = await axios.delete(
+          this.urlbe + "/evaluate/delete/" + id,
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }
+        );
+        response
+        window.location.replace(
+          "http://localhost:8080/shop/" + this.product.id
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    }
   },
 };
 </script>
@@ -397,6 +453,17 @@ export default {
 .products-name {
   font-size: 30px;
   margin-bottom: 20px;
+  position: relative;
+}
+
+.sale {
+  position: absolute;
+  top: 0;
+  transform: translateY(15px);
+  left: 0;
+  font-size: 20px;
+  color: red;
+  font-weight: 700;
 }
 
 .products-price {
@@ -511,16 +578,24 @@ export default {
 .username {
   width: 100%;
   font-size: 20px;
-  height: 50px;
+  height: 100px;
   line-height: 50px;
   text-align: left;
   margin-left: 30px;
   display: inline-block;
 }
 
+.avt-img {
+  width: 70px;
+  height: 70px;
+  border: 3px solid #cccccc;
+  border-radius: 200px;
+  margin: 10px;
+}
+
 .rate-star {
   position: absolute;
-  top: 18px;
+  top: 40px;
   left: 50%;
   transform: translateX(-50%);
 }
@@ -590,7 +665,7 @@ textarea {
 
 .comment-item__user-rate {
   display: inline-block;
-  transform: translateY(-25px);
+  transform: translateY(-50px);
 }
 
 .comment-item__user-rate .star {

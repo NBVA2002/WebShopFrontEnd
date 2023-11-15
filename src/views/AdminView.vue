@@ -2,7 +2,23 @@
   <div class="user-container">
     <div class="grid">
       <div class="dashboard">
-        <div class="dashboard-avt">Hello {{ user.lastName }}</div>
+        <div class="dashboard-avt"
+            @click="goToUser">
+          <img
+            :src="this.urlbe + '/file/' + user.avatarUrl"
+            alt=""
+            class="item-img"
+            v-if="user.avatarUrl != null"
+            @click="goToUser"
+          />
+          <img
+            src="../assets/images/people/143086968_2856368904622192_1959732218791162458_n.png"
+            alt=""
+            class="item-img"
+            v-if="user.avatarUrl == null"
+          />
+          Hello, {{ user.username }}
+        </div>
         <div
           class="dashboard-item"
           @click="dashboardItemSelect(1, this.urlbe + '/product/list?')"
@@ -84,12 +100,13 @@
                 v-if="updateChart"
               />
               <button
-                @click="updateChart = true"
+                @click="getChart"
                 class="btn__update-chart"
                 v-if="!updateChart"
               >
-                Lấy dữ liệu biểu đồ
+                Lấy dữ liệu biểu đồ doanh thu năm
               </button>
+              <input type="number" v-model="currentYear" v-if="!updateChart" />
             </div>
             <div class="sales">
               <div>Tổng doanh thu:</div>
@@ -189,16 +206,14 @@
                 <td style="width: 200px">CATEGORY</td>
                 <td style="width: 120px">PRICE</td>
                 <td style="width: 400px">DESCRIPTION</td>
+                <td style="width: 170px">DISCOUNT(%)</td>
                 <td style="width: 150px">OPTION</td>
               </thead>
               <tr v-for="product in products.content" :key="product.id">
                 <td>{{ product.id }}</td>
                 <td>
                   <img
-                    :src="
-                      urlbe + '/file/' +
-                      product.imageEntities[0].imgURL
-                    "
+                    :src="urlbe + '/file/' + product.imageEntities[0].imgURL"
                     alt=""
                     class="product-img"
                   />
@@ -244,6 +259,13 @@
                     v-model="product.description"
                   >
                   </textarea>
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    v-model="product.discount"
+                    style="text-align: center; border: none"
+                  />
                 </td>
                 <td>
                   <div style="width: 100%">
@@ -421,28 +443,76 @@
               <thead style="height: 40px">
                 <td style="width: 70px">ID</td>
                 <td style="width: 250px">USERNAME</td>
-                <td style="width: 300px">EMAIL</td>
+                <td style="width: 400px">EMAIL</td>
                 <td style="width: 200px">PASSWORD</td>
                 <td style="width: 200px">FRISTNAME</td>
                 <td style="width: 200px">LASTNAME</td>
-                <td style="width: 200px">PHONE</td>
+                <td style="width: 170px">PHONE</td>
                 <td style="width: 200px">ADDRESS</td>
                 <td style="width: 200px">ROLE</td>
                 <td style="width: 170px">OPTION</td>
               </thead>
               <tr v-for="user in users.content" :key="user.id">
                 <td style="">{{ user.id }}</td>
-                <td style="">{{ user.username }}</td>
-                <td style="">{{ user.email }}</td>
-                <td style="width: 300px; height: 50px">{{ user.password }}</td>
-                <td style="">{{ user.firstName }}</td>
-                <td style="">{{ user.lastName }}</td>
-                <td style="">{{ user.phone }}</td>
-                <td style="">{{ user.address }}</td>
-                <td style="">{{ user.roles }}</td>
                 <td style="">
-                  <button>Update</button>
-                  <button>Delete</button>
+                  <input
+                    type="text"
+                    style="border: none"
+                    v-model="user.username"
+                  />
+                </td>
+                <td style="width: 400px">
+                  <input
+                    type="text"
+                    style="border: none"
+                    v-model="user.email"
+                  />
+                </td>
+                <td style="width: 300px; height: 50px">
+                  <input
+                    type="text"
+                    style="border: none"
+                    v-model="user.password"
+                  />
+                </td>
+                <td style="">
+                  <input
+                    type="text"
+                    style="border: none"
+                    v-model="user.firstName"
+                  />
+                </td>
+                <td style="">
+                  <input
+                    type="text"
+                    style="border: none"
+                    v-model="user.lastName"
+                  />
+                </td>
+                <td style="">
+                  <input
+                    type="text"
+                    style="border: none"
+                    v-model="user.phone"
+                  />
+                </td>
+                <td style="">
+                  <input
+                    type="text"
+                    style="border: none"
+                    v-model="user.address"
+                  />
+                </td>
+                <td style="">
+                  <input
+                    type="text"
+                    style="border: none"
+                    v-model="user.roles"
+                  />
+                </td>
+                <td style="">
+                  <button @click="updateUser(user)">Update</button>
+                  <button @click="deleteUser(user.id)">Delete</button>
                 </td>
               </tr>
             </table>
@@ -586,12 +656,13 @@ export default {
       totalPrice: 0,
       totalByMonth: [],
       updateChart: false,
+      currentYear: new Date().getFullYear(),
 
       users: [],
     };
   },
 
-    props: ["islogin", "isAdmin", "user", "urlbe"],
+  props: ["islogin", "isAdmin", "user", "urlbe"],
 
   methods: {
     logout() {
@@ -731,9 +802,13 @@ export default {
             category: product.category,
             price: product.price,
             description: product.description,
+            discount: product.discount,
             gender: product.gender,
             typeProductEntities: product.typeProductEntities,
             imageEntities: product.imageEntities,
+            rate: product.rate,
+            numEvaluate: product.numEvaluate,
+            numOrder: product.numOrder
           },
           {
             headers: {
@@ -772,9 +847,7 @@ export default {
     async getListCategory(type) {
       try {
         const response = await axios.get(
-          this.urlbe + "/category/list?type=" +
-            type +
-            "&limit=100&page=1"
+          this.urlbe + "/category/list?type=" + type + "&limit=100&page=1"
         );
         return response.data.content;
       } catch (error) {
@@ -929,7 +1002,7 @@ export default {
     async getToTalByMonth(fromDate, toDate) {
       try {
         const response = await axios.get(
-          this.urlbe + "/order/listdate?from=" + fromDate +"&to=" + toDate,
+          this.urlbe + "/order/listdate?from=" + fromDate + "&to=" + toDate,
           {
             headers: {
               "Access-Control-Allow-Origin": "*",
@@ -938,8 +1011,8 @@ export default {
           }
         );
         let totalprice = 0;
-        for(let i = 0; i < response.data.length; i++){
-            totalprice += response.data[i].totalPrice;
+        for (let i = 0; i < response.data.length; i++) {
+          totalprice += response.data[i].totalPrice;
         }
         return totalprice;
       } catch (error) {
@@ -973,6 +1046,125 @@ export default {
       } catch (error) {
         console.error(error);
       }
+    },
+
+    async updateUser(user) {
+      if (
+        user.firstName != "" &&
+        user.lastName != "" &&
+        user.email != "" &&
+        user.phone != "" &&
+        user.address != "" &&
+        user.password != ""
+      ) {
+        try {
+          const response = await axios.put(
+            this.urlbe + "/user/update/" + user.id,
+            {
+              username: user.username,
+              password: user.password,
+              roles: user.roles,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              phone: user.phone,
+              email: user.email,
+              address: user.address,
+              avatarUrl: user.avatarUrl,
+              userInfoEntity: {
+                id: user.userInfoEntity.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                avatarUrl: user.avatarUrl,
+              },
+            },
+            {
+              headers: {
+                "Access-Control-Allow-Origin": "*",
+                Authorization: "Bearer " + localStorage.getItem("token"),
+              },
+            }
+          );
+          alert("Cập nhật thông tin thành công");
+          return response;
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    },
+
+    async deleteUser(id) {
+      try {
+        const response = await axios.delete(this.urlbe + "/user/delete/" + id, {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        });
+        alert("Xóa user thành công");
+        this.getListUser();
+        return response;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async getChart() {
+      this.totalByMonth[0] = await this.getToTalByMonth(
+        this.currentYear + "-01-01",
+        this.currentYear + "-01-31"
+      );
+      this.totalByMonth[1] = await this.getToTalByMonth(
+        this.currentYear + "-02-01",
+        this.currentYear + "-02-29"
+      );
+      this.totalByMonth[2] = await this.getToTalByMonth(
+        this.currentYear + "-03-01",
+        this.currentYear + "-03-31"
+      );
+      this.totalByMonth[3] = await this.getToTalByMonth(
+        this.currentYear + "-04-01",
+        this.currentYear + "-04-30"
+      );
+      this.totalByMonth[4] = await this.getToTalByMonth(
+        this.currentYear + "-05-01",
+        this.currentYear + "-05-31"
+      );
+      this.totalByMonth[5] = await this.getToTalByMonth(
+        this.currentYear + "-06-01",
+        this.currentYear + "-06-30"
+      );
+      this.totalByMonth[6] = await this.getToTalByMonth(
+        this.currentYear + "-07-01",
+        this.currentYear + "-07-31"
+      );
+      this.totalByMonth[7] = await this.getToTalByMonth(
+        this.currentYear + "-08-01",
+        this.currentYear + "-08-31"
+      );
+      this.totalByMonth[8] = await this.getToTalByMonth(
+        this.currentYear + "-09-01",
+        this.currentYear + "-09-30"
+      );
+      this.totalByMonth[9] = await this.getToTalByMonth(
+        this.currentYear + "-10-01",
+        this.currentYear + "-10-31"
+      );
+      this.totalByMonth[10] = await this.getToTalByMonth(
+        this.currentYear + "-11-01",
+        this.currentYear + "-11-30"
+      );
+      this.totalByMonth[11] = await this.getToTalByMonth(
+        this.currentYear + "-12-01",
+        this.currentYear + "-12-31"
+      );
+      console.log(this.totalByMonth);
+      this.chartDataa.datasets[0].data = this.totalByMonth;
+      this.updateChart = true;
+      console.log(this.updateChart);
+    },
+
+    goToUser() {
+      this.$router.push('/user')
     },
 
     changePage(page) {
@@ -1030,20 +1222,7 @@ export default {
 
       this.totalPrice = await this.getToTalPrice();
 
-      this.totalByMonth[0] = await this.getToTalByMonth("2023-01-01","2023-01-31")
-      this.totalByMonth[1] = await this.getToTalByMonth("2023-02-01","2023-02-29")
-      this.totalByMonth[2] = await this.getToTalByMonth("2023-03-01","2023-03-31")
-      this.totalByMonth[3] = await this.getToTalByMonth("2023-04-01","2023-04-30")
-      this.totalByMonth[4] = await this.getToTalByMonth("2023-05-01","2023-05-31")
-      this.totalByMonth[5] = await this.getToTalByMonth("2023-06-01","2023-06-30")
-      this.totalByMonth[6] = await this.getToTalByMonth("2023-07-01","2023-07-31")
-      this.totalByMonth[7] = await this.getToTalByMonth("2023-08-01","2023-08-31")
-      this.totalByMonth[8] = await this.getToTalByMonth("2023-09-01","2023-09-30")
-      this.totalByMonth[9] = await this.getToTalByMonth("2023-10-01","2023-10-31")
-      this.totalByMonth[10] = await this.getToTalByMonth("2023-11-01","2023-11-30")
-      this.totalByMonth[11] = await this.getToTalByMonth("2023-12-01","2023-12-31")
-      console.log(this.totalByMonth);
-      this.chartDataa.datasets[0].data = this.totalByMonth;
+      
     }
   },
 
@@ -1131,9 +1310,9 @@ export default {
 
 .item-img {
   width: 120px;
-  height: 150px;
-  /* object-fit: cover; */
-  border-radius: 20px;
+  height: 120px;
+  border: 3px solid #cccccc;
+  border-radius: 100px;
   margin-right: 10px;
 }
 
@@ -1210,6 +1389,7 @@ export default {
   line-height: 150px;
   font-weight: 500;
   color: #fff;
+  cursor: pointer;
 }
 
 .dashboard-item {
@@ -1521,19 +1701,19 @@ export default {
 }
 
 .btn__update-chart {
-  width: 100px;
-  height: 50px;
+  width: 200px;
+  /* height: 50px; */
   font-size: 20px;
   margin: 20px;
   background-color: #fff;
-  border: 1px solid #000;
+  /* border: 1px solid #000; */
   border-radius: 10px;
 }
 
 .btn__update-chart:hover {
   cursor: pointer;
-  background-color: #42b983;
-  color: #fff;
+  /* background-color: #42b983; */
+  /* color: #fff; */
 }
 </style>
 

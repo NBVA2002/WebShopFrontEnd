@@ -7,7 +7,7 @@
       </div>
       <div class="login-content">
         <div action="index.html">
-          <form>
+          <form  @submit.prevent="submitForm">
             <img src="../assets/img/avatar.svg" />
             <h2 class="title">Đổi mật khẩu</h2>
             <div class="input-div one">
@@ -22,6 +22,9 @@
                   v-model="password"
                 />
               </div>
+              <span v-if="errors.password">
+                {{ errors.password }}
+              </span>
             </div>
             <div class="input-div one">
               <div class="i">
@@ -32,14 +35,17 @@
                   type="password"
                   class="input"
                   placeholder="Nhập lại mật khẩu"
-                  v-model="ConfirmPassword"
+                  v-model="confirmPassword"
                 />
               </div>
+              <span v-if="errors.confirmPassword">
+                {{ errors.confirmPassword }}
+              </span>
             </div>
-          </form>
-            <button type="submit" class="btn" @click="login">
+            <button type="submit" class="btn">
               Đổi mật khẩu
             </button>
+          </form>
         </div>
       </div>
     </div>
@@ -52,20 +58,41 @@ export default {
   data() {
     return {
       // isLogin: true,
-      ConfirmPassword: "",
+      confirmPassword: "",
       password: "",
       user: {},
+      errors: {},
     };
   },
 
     props: ["islogin", "isAdmin", "urlbe"],
 
   methods: {
-    async login() {
-      if(this.password != this.ConfirmPassword){
-        alert("Mật khẩu không khớp");
-        return;
+
+    validPassword(password) {
+      return password.length >= 6;
+    },
+
+    async submitForm() {
+      this.errors = {};
+
+      if (this.password == "") {
+        this.errors.password = "Password is required.";
+      } else if (!this.validPassword(this.password)) {
+        this.errors.password = "Password must be at least 6 characters.";
       }
+
+      if (this.confirmPassword == "") {
+        this.errors.confirmPassword = "Confirm Password is required.";
+      } else if (this.confirmPassword != this.password) {
+        this.errors.confirmPassword = "Confirm Password is not correct.";
+      }
+
+      if (Object.keys(this.errors).length === 0) {
+        await this.login();
+      }
+    },
+    async login() {
       try {
         const response = await axios.put(
           this.urlbe + "/user/update/" + this.user.id,
@@ -78,6 +105,7 @@ export default {
             lastName: this.user.lastName,
             phone: this.user.phone,
             address: this.user.address,
+            avatarUrl: this.user.avatarUrl,
             userInfoEntity: this.user.userInfoEntity
           },
           {
@@ -91,7 +119,7 @@ export default {
         this.$router.push("/login");
         return response;
       } catch (error) {
-        alert("Tài khoản hoặc mật khẩu không đúng");
+        console.error(error);
       }
     },
 
@@ -211,6 +239,13 @@ form {
 .input-div > div {
   position: relative;
   height: 45px;
+}
+
+.input-div span {
+  bottom: 0;
+  left: 1;
+  position: absolute;
+  color: red;
 }
 
 .input-div > div > h5 {

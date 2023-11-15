@@ -11,13 +11,14 @@
         <router-link to="/men">Nam</router-link>
         <router-link to="/women">Nữ</router-link>
         <router-link to="/accessories">Phụ kiện</router-link>
+        <router-link to="/sale">Sale</router-link>
         <router-link to="/collection">Bộ sưu tập</router-link>
         <router-link to="/shop">Shop</router-link>
         <router-link to="/about">About</router-link>
         <router-link to="/search" class="magnifying-glass">
           <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
         </router-link>
-        <router-link to="/about" class="shop-cart">
+        <router-link to="/nofication" class="shop-cart">
           <font-awesome-icon :icon="['fas', 'bell']" />
         </router-link>
         <div class="user">
@@ -42,9 +43,7 @@
 <script>
 export default {
   data() {
-    return {
-      
-    };
+    return {};
   },
 
   props: ["islogin", "isAdmin", "user"],
@@ -54,13 +53,11 @@ export default {
       this.$router.push("/login");
     },
   },
-  created() {
-  },
+  created() {},
 };
 </script>
 
 <style scoped>
-
 .nav-bar {
   background: #fff;
   box-shadow: 0px 4px 5px 0px rgba(0, 0, 0, 0.05);
@@ -115,5 +112,4 @@ export default {
 .magnifying-glass:hover {
   color: #42b983;
 }
-
 </style>

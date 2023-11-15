@@ -1,199 +1,159 @@
 <template>
   <div class="container">
     <img class="wave" src="../assets/img/wave.png" />
-    <div class="container">
-      <div class="img">
-        <img src="../assets/img/undraw_window_shopping_re_0kbm.svg" />
-      </div>
-      <div class="login-content" id="form-1">
-        <form action="index.html">
-          <img src="../assets/img/avatar.svg" />
-          <h2 class="title">Let's Register</h2>
-          <!-- <div class="input-div one">
-					<div class="i">
-						<font-awesome-icon :icon="['fas', 'user']" />
-					</div>
-					<div class="div">
-						<h5>Username</h5>
-						<input type="text" class="input">
-					</div>
-				</div>
-				<div class="input-div pass">
-					<div class="i">
-						<font-awesome-icon :icon="['fas', 'lock']" />
-					</div>
-					<div class="div">
-						<h5>Password</h5>
-						<input type="password" class="input">
-					</div>
-				</div>
-				<div class="input-div phone">
-					<div class="i">
-						<i class="fas fa-phone"></i>
-					</div>
-					<div class="div">
-						<h5>Phone Number</h5>
-						<input type="text" class="input">
-					</div>
-				</div>
-				<div class="input-div phone">
-					<div class="i">
-						<i class="fas fa-envelope"></i>
-					</div>
-					<div class="div">
-						<h5>Email</h5>
-						<input type="email" class="input">
-					</div>
-				</div>
-				<div class="input-div code">
-					<div class="i">
-						<i class="fas fa-shield-alt"></i>
-					</div>
-					<div class="div">
-						<h5>First Name</h5>
-						<input type="text" class="input ">
-					</div>
-				</div> -->
-          <div class="input-div one">
-            <div class="i">
-              <i class="fas fa-user"></i>
+    <div class="login-content">
+      <form @submit.prevent="submitForm">
+        <img src="../assets/img/avatar.svg" />
+        <h2 class="title">Let's Register</h2>
+        <div class="form-input">
+          <div class="form-left">
+            <div class="input-div one">
+              <div class="i">
+                <font-awesome-icon :icon="['fas', 'user']" />
+              </div>
+              <div class="div">
+                <input
+                  type="text"
+                  class="input"
+                  placeholder="First Name"
+                  v-model="firstName"
+                />
+              </div>
+              <span
+                v-if="errors.firstName"
+                :class="{ 'fade-out': shouldFadeOut }"
+                >{{ errors.firstName }}</span
+              >
             </div>
-            <div class="div">
-              <h5>First Name</h5>
-              <input id="fname" type="text" class="input" />
-              <small></small>
+            <div class="input-div one">
+              <div class="i">
+                <font-awesome-icon :icon="['fas', 'user']" />
+              </div>
+              <div class="div">
+                <input
+                  type="text"
+                  class="input"
+                  placeholder="UserName"
+                  v-model="username"
+                />
+              </div>
+              <span
+                v-if="errors.username"
+                :class="{ 'fade-out': shouldFadeOut }"
+                >{{ errors.username }}</span
+              >
             </div>
-          </div>
-          <div class="input-div one">
-            <div class="i">
-              <i class="fas fa-user"></i>
+            <div class="input-div pass">
+              <div class="i">
+                <font-awesome-icon :icon="['fas', 'envelope']" />
+              </div>
+              <div class="div">
+                <input
+                  type="text"
+                  class="input"
+                  placeholder="Email"
+                  v-model="email"
+                />
+              </div>
+              <span v-if="errors.email">{{ errors.email }}</span>
             </div>
-            <div class="div">
-              <h5>Last Name</h5>
-              <input id="lname" type="text" class="input" />
-              <small></small>
-            </div>
-          </div>
-          <div class="input-div pass">
-            <div class="i">
-              <i class="fas fa-lock"></i>
-            </div>
-            <div class="div">
-              <h5>Password</h5>
-              <input id="pass" type="password" class="input" />
-              <small></small>
+            <div class="input-div pass">
+              <div class="i">
+                <font-awesome-icon :icon="['fas', 'lock']" />
+              </div>
+              <div class="div">
+                <input
+                  type="password"
+                  class="input"
+                  placeholder="Password"
+                  v-model="password"
+                />
+              </div>
+              <span
+                v-if="errors.password"
+                :class="{ 'fade-out': shouldFadeOut }"
+                >{{ errors.password }}</span
+              >
             </div>
           </div>
-          <div class="input-div pass">
-            <div class="i">
-              <i class="fas fa-lock"></i>
+          <div class="form-right">
+            <div class="input-div one">
+              <div class="i">
+                <font-awesome-icon :icon="['fas', 'user']" />
+              </div>
+              <div class="div">
+                <input
+                  type="text"
+                  class="input"
+                  placeholder="Last Name"
+                  v-model="lastName"
+                />
+              </div>
+              <span
+                v-if="errors.lastName"
+                :class="{ 'fade-out': shouldFadeOut }"
+                >{{ errors.lastName }}</span
+              >
             </div>
-            <div class="div">
-              <h5>Password Confirm</h5>
-              <input id="conpass" type="password" class="input" />
-              <small></small>
+            <div class="input-div one">
+              <div class="i">
+                <font-awesome-icon :icon="['fas', 'phone']" />
+              </div>
+              <div class="div">
+                <input
+                  type="text"
+                  class="input"
+                  placeholder="Phone"
+                  v-model="phone"
+                />
+              </div>
+              <span
+                v-if="errors.phone"
+                :class="{ 'fade-out': shouldFadeOut }"
+                >{{ errors.phone }}</span
+              >
+            </div>
+            <div class="input-div pass">
+              <div class="i">
+                <font-awesome-icon :icon="['fas', 'location-dot']" />
+              </div>
+              <div class="div">
+                <input
+                  type="text"
+                  class="input"
+                  placeholder="Address"
+                  v-model="address"
+                />
+              </div>
+              <span
+                v-if="errors.address"
+                :class="{ 'fade-out': shouldFadeOut }"
+                >{{ errors.address }}</span
+              >
+            </div>
+            <div class="input-div pass">
+              <div class="i">
+                <font-awesome-icon :icon="['fas', 'lock']" />
+              </div>
+              <div class="div">
+                <input
+                  type="password"
+                  class="input"
+                  placeholder="Confirm password"
+                  v-model="confirmPassword"
+                />
+              </div>
+              <span
+                v-if="errors.confirmPassword"
+                :class="{ 'fade-out': shouldFadeOut }"
+                >{{ errors.confirmPassword }}</span
+              >
             </div>
           </div>
-          <div class="input-div phone">
-            <div class="i">
-              <i class="fas fa-phone"></i>
-            </div>
-            <div class="div">
-              <h5>Phone Number</h5>
-              <input id="tel" type="text" class="input" />
-              <small></small>
-            </div>
-          </div>
-          <div class="input-div phone">
-            <div class="i">
-              <i class="fas fa-envelope"></i>
-            </div>
-            <div class="div">
-              <h5>Email</h5>
-              <input id="emails" type="email" class="input" />
-              <small></small>
-            </div>
-          </div>
-          <input type="submit" class="btn" value="Register" />
-        </form>
-      </div>
+        </div>
+        <button type="submit" class="btn" @click="submitForm">Register</button>
+      </form>
     </div>
-
-    <!-- <img class="wave" src="img/wave.png">
-	<div class="container">
-		<div class="img">
-			<img src="img/undraw_shopping_re_hdd9.svg">
-		</div>
-		<div class="login-content" id="form-1">
-			<form action="index.html">
-				<img src="img/undraw_personal_info_re_ur1n.svg">
-				<h2 class="title">Let's Register</h2>
-				<div class="input-div one">
-					<div class="i">
-						<i class="fas fa-user"></i>
-					</div>
-					<div class="div">
-						<h5>First Name</h5>
-						<input id="fname" type="text" class="input">
-						<small></small>
-					</div>
-				</div>
-				<div class="input-div one">
-					<div class="i">
-						<i class="fas fa-user"></i>
-					</div>
-					<div class="div">
-						<h5>Last Name</h5>
-						<input id="lname" type="text" class="input">
-						<small></small>
-					</div>
-				</div>
-				<div class="input-div pass">
-					<div class="i">
-						<i class="fas fa-lock"></i>
-					</div>
-					<div class="div">
-						<h5>Password</h5>
-						<input id="pass" type="password" class="input">
-						<small></small>
-					</div>
-				</div>
-				<div class="input-div pass">
-					<div class="i">
-						<i class="fas fa-lock"></i>
-					</div>
-					<div class="div">
-						<h5>Password Confirm</h5>
-						<input id="conpass" type="password" class="input">
-						<small></small>
-					</div>
-				</div>
-				<div class="input-div phone">
-					<div class="i">
-						<i class="fas fa-phone"></i>
-					</div>
-					<div class="div">
-						<h5>Phone Number</h5>
-						<input id="phone" type="text" class="input">
-						<small></small>
-					</div>
-				</div>
-				<div class="input-div phone">
-					<div class="i">
-						<i class="fas fa-envelope"></i>
-					</div>
-					<div class="div">
-						<h5>Email</h5>
-						<input id ="emails" type="email" class="input">
-						<small></small>
-					</div>
-				</div>
-
-
-				<input type="submit" class="btn" value="Register">
-			</form>
-		</div>
-	</div> -->
   </div>
 </template>
 
@@ -202,79 +162,149 @@ import axios from "axios";
 export default {
   data() {
     return {
-      isLogin: true,
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      address: "",
       username: "",
       password: "",
+      confirmPassword: "",
+      isLogin: true,
       token: "",
       user: {},
+      errors: {},
+      shouldFadeOut: false,
     };
   },
-  
-    props: ["islogin", "isAdmin", "urlbe"],
+
+  props: ["islogin", "isAdmin", "urlbe"],
 
   methods: {
-    async login() {
-      const response = await axios.post(this.urlbe + "/api/login", {
-        username: this.username,
-        password: this.password,
-      });
-      this.token = response.data.jwt;
-      localStorage.setItem("token", this.token);
-      window.location.replace("http://localhost:8080/");
+    async register() {
+      try {
+        const response = await axios.post(this.urlbe + "/user/create", {
+          username: this.username,
+          password: this.confirmPassword,
+          firstName: this.firstName,
+          lastName: this.lastName,
+          email: this.email,
+          phone: this.phone,
+          address: this.address,
+          roles: "ROLE_USER",
+        });
+        console.log(response);
+        alert("Register successfully!");
+        this.$router.push("/login");
+      } catch (error) {
+        console.error(error);
+      }
     },
 
-    // validateEmail(inputText) {
-    //   var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    //   if (inputText.value.match(mailformat)) {
-    //     alert("Valid email address!");
-    //     document.form1.text1.focus();
-    //     return true;
-    //   } else {
-    //     alert("You have entered an invalid email address!");
-    //     document.form1.text1.focus();
-    //     return false;
-    //   }
-    // },
+    validEmail(email) {
+      var re =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
+    },
 
-    // phonenumber(inputtxt) {
-    //   var phoneno = /^\d{10}$/;
-    //   if (inputtxt.value.match(phoneno)) {
-    //     return true;
-    //   } else {
-    //     alert("message");
-    //     return false;
-    //   }
-    // },
-    // async current() {
-    //   try {
-    //     const response = await axios.get(this.urlbe + "/api/current", {
-    //       headers:{
-    //         'Access-Control-Allow-Origin': '*',
-    //         'Authorization': 'Bearer ' + localStorage.getItem('token'),
-    //       },
-    //     });
-    //     this.user = response.data.userEntity;
-    //     this.$emit('message-sent', this.user);
-    //     console.log(this.user);
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // },
-    // async getRandom() {
-    //   try {
-    //     const response = await axios.get(this.urlbe + "/api/random", {
-    //       headers: {
-    //         Authorization: "Bearer " + localStorage.getItem("token"),
-    //       },
-    //     });
-    //     console.log(response);
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // },
-    // sendMessage() {
-    //   this.$emit('message-sent', 'Hello from child');
-    // }
+    isVietnamesePhoneNumber(number) {
+      return /^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(
+        number
+      );
+    },
+
+    validPassword(password) {
+      return password.length >= 6;
+    },
+
+    async checkAcountUser() {
+      try {
+        const response = await axios.get(
+          this.urlbe + "/user/checkusername?username=" + this.username,
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          }
+        );
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async checkEmail() {
+      try {
+        const response = await axios.get(
+          this.urlbe + "/user/checkemail?email=" + this.email,
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          }
+        );
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async submitForm() {
+      this.errors = {};
+
+      if (this.firstName == "") {
+        this.errors.firstName = "FirstName is required.";
+      }
+
+      if (this.lastName == "") {
+        this.errors.lastName = "LastName is required.";
+      }
+
+      if (this.username == "") {
+        this.errors.username = "Username is required.";
+      } else if (await this.checkAcountUser()) {
+        this.errors.username = "Username already exists.";
+      }
+
+      if (this.phone == "") {
+        this.errors.phone = "Phone number is required.";
+      } else if (!this.isVietnamesePhoneNumber(this.phone)) {
+        this.errors.phone = "Phone number is not valid.";
+      }
+
+      if (this.email == "") {
+        this.errors.email = "Email is required.";
+      } else if (!this.validEmail(this.email)) {
+        this.errors.email = "Email is not valid.";
+      } else if (await this.checkEmail()) {
+        this.errors.email = "Email already exists.";
+      }
+
+      if (this.address == "") {
+        this.errors.address = "Address is required.";
+      }
+
+      if (this.password == "") {
+        this.errors.password = "Password is required.";
+      }else if (!this.validPassword(this.password)) {
+        this.errors.password = "Password must be at least 6 characters.";
+      }
+
+      if (this.confirmPassword == "") {
+        this.errors.confirmPassword = "Confirm Password is required.";
+      } else if (this.confirmPassword != this.password) {
+        this.errors.confirmPassword = "Confirm Password is not correct.";
+      }
+
+      if (Object.keys(this.errors).length === 0) {
+        await this.register();
+      }
+    },
+    mounted() {
+      setTimeout(() => {
+        this.shouldFadeOut = true;
+      }, 3000); // 3 giây
+    },
   },
 };
 </script>
@@ -296,13 +326,15 @@ body {
   bottom: 0;
   left: 0;
   height: 100%;
+  width: 100%;
   z-index: -1;
 }
 
 .container {
   width: 100vw;
   height: 100vh;
-  display: grid;
+  display: flex;
+  justify-content: center;
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 7rem;
   padding: 0 2rem;
@@ -315,18 +347,35 @@ body {
 }
 
 .login-content {
+  width: 100%;
   display: flex;
-  justify-content: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
   text-align: center;
+}
+
+form {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.form-input {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 .img img {
   width: 500px;
 }
 
-form {
+.form-right,
+.form-left {
   width: 360px;
+  padding: 10px;
 }
 
 .login-content img {
@@ -423,7 +472,7 @@ form {
   background: none;
   padding: 0.5rem 0.7rem;
   font-size: 1.2rem;
-  color: #555;
+  color: #000;
   font-family: "poppins", sans-serif;
 }
 
@@ -431,11 +480,23 @@ form {
   margin-bottom: 4px;
 }
 
+.input-div span {
+  bottom: 0;
+  left: 1;
+  position: absolute;
+  color: red;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+}
+
 a {
   display: block;
   text-align: right;
   text-decoration: none;
-  color: #999;
+  color: #000;
   font-size: 0.9rem;
   transition: 0.3s;
 }
@@ -446,11 +507,11 @@ a:hover {
 
 .btn {
   display: block;
-  width: 100%;
+  width: 30%;
   height: 50px;
   border-radius: 25px;
   outline: none;
-  border: none;
+  border: 2px solid #d9d9d9;
   background-image: linear-gradient(to right, #32be8f, #38d39f, #32be8f);
   background-size: 200%;
   font-size: 1.2rem;
@@ -461,6 +522,7 @@ a:hover {
   cursor: pointer;
   transition: 0.5s;
 }
+
 .btn:hover {
   background-position: right;
 }

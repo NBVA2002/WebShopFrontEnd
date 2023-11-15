@@ -15,15 +15,22 @@
               alt=""
               class="item-img"
             />
+            <div class="sale" v-if="product.discount > 0">
+            <img
+              src="../assets/images/features/—Pngtree—sale_146155.png"
+              alt=""
+              class=""
+              style="width: 100px; height: 100px;"
+            />
+            {{product.discount}}%
+            </div>
             <div class="product-name">{{ product.productName }}</div>
             <div class="price-sold">
-              <h2>{{ formatPrice(product.price) }}</h2>
+              <h2 v-if="product.discount == 0">{{ formatPrice(product.price) }}</h2>
+              <h2 v-if="product.discount > 0" style="color: red; font-weight: 700">{{ formatPrice(product.price * (100 - product.discount)/100) }}</h2>
               <h4>Đã bán {{ product.numOrder }}</h4>
             </div>
           </router-link>
-          <!-- <button @click="addCart(product)" class="btn-addcart">
-            Add to cart
-          </button> -->
         </div>
       </div>
 
@@ -348,6 +355,7 @@ export default {
   font-size: 20px;
   box-sizing: border-box;
   padding: 20px;
+  z-index: 1;
 }
 
 .input-filter {
@@ -461,6 +469,16 @@ export default {
   border-radius: 30px;
   margin: 15px;
   border: 2px solid #c0c0c0;
+position: relative;
+}
+
+.sale {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  font-size: 20px;
+  color: red;
+  font-weight: 700;
 }
 
 .item:hover {

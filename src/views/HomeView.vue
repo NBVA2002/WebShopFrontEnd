@@ -43,12 +43,20 @@
                 >
                   <img
                     :src="
-                      this.urlbe + '/file/' +
-                      product.imageEntities[0].imgURL
+                      this.urlbe + '/file/' + product.imageEntities[0].imgURL
                     "
                     alt=""
                     class="item-img"
                   />
+                  <div class="sale" v-if="product.discount > 0">
+                    <img
+                      src="../assets/images/features/—Pngtree—sale_146155.png"
+                      alt=""
+                      class=""
+                      style="width: 100px; height: 100px"
+                    />
+                    {{ product.discount }}%
+                  </div>
                   <div class="product-name">{{ product.productName }}</div>
                   <div class="price-sold">
                     <h2>{{ formatPrice(product.price) }}</h2>
@@ -64,6 +72,66 @@
           <router-link to="/shop" class="viewmore-btn">Xem thêm</router-link>
         </div>
       </div>
+
+        <img
+          src="../assets/images/banner/bi-quyet-cho-sale-bach-phat-bach-trung.jpg"
+          alt=""
+          class=""
+          style="width: 500px; height: 200px"
+        />
+      <div class="new-product" style="">
+        <swiper
+          :modules="modules"
+          :loop="true"
+          :pagination="true"
+          :autoplay="{
+            delay: 5000,
+            disableOnInteraction: false,
+          }"
+          class="list-new"
+        >
+          <swiper-slide class="" v-for="idx in totalPage" :key="idx">
+            <div class="list-item">
+              <div
+                class="item"
+                v-for="product in saleproducts[idx]"
+                :key="product.id"
+              >
+                <router-link
+                  class="item-link"
+                  :to="{ name: 'product', params: { id: product.id } }"
+                >
+                  <img
+                    :src="
+                      this.urlbe + '/file/' + product.imageEntities[0].imgURL
+                    "
+                    alt=""
+                    class="item-img"
+                  />
+                  <div class="sale" v-if="product.discount > 0">
+                    <img
+                      src="../assets/images/features/—Pngtree—sale_146155.png"
+                      alt=""
+                      class=""
+                      style="width: 100px; height: 100px"
+                    />
+                    {{ product.discount }}%
+                  </div>
+                  <div class="product-name">{{ product.productName }}</div>
+                  <div class="price-sold">
+                    <h2>{{ formatPrice(product.price) }}</h2>
+                    <h4>Đã bán {{ product.numOrder }}</h4>
+                  </div>
+                </router-link>
+              </div>
+            </div>
+          </swiper-slide>
+        </swiper>
+        <div class="viewmore">
+          <div></div>
+          <router-link to="/sale" class="viewmore-btn">Xem thêm</router-link>
+        </div>
+      </div>
     </div>
 
     <div class="grid">
@@ -72,10 +140,13 @@
         <router-link to="/women" class="gender-view women-view"></router-link>
       </div>
     </div>
-      <div class="grid new-product" style="margin-top: 40px; margin-bottom: 10px">
-        <h1>Bộ sưu tập mới</h1>
-<router-link to="/collection/summercollection" class="banner banner1"></router-link>
-      </div>
+    <div class="grid new-product" style="margin-top: 40px; margin-bottom: 10px">
+      <h1>Bộ sưu tập mới</h1>
+      <router-link
+        to="/collection/summercollection"
+        class="banner banner1"
+      ></router-link>
+    </div>
   </div>
 </template>
 
@@ -110,6 +181,7 @@ export default {
       ],
       modules: [Autoplay, Pagination],
       products: [],
+      saleproducts: [],
       url: this.urlbe + "/product/list?",
       search: "",
       gender: "",
@@ -122,6 +194,7 @@ export default {
       typeSort: "id",
       isSort: "desc",
       totalItem: 0,
+      totalItemSale: 0,
       totalPage: 0,
       pageNumber: 1,
       limit: 4,
@@ -172,6 +245,43 @@ export default {
         console.error(error);
       }
     },
+
+    async getListSale(page) {
+      try {
+        const response = await axios.get(
+          this.urlbe +
+            "/product/sale?" +
+            "search=" +
+            this.search +
+            "&gender=" +
+            this.gender +
+            "&categorytype=" +
+            this.categorytype +
+            "&category=" +
+            this.category +
+            "&type=" +
+            this.type +
+            "&rate=" +
+            this.userRateFilter +
+            "&pricegt=" +
+            this.priceGT +
+            "&pricelt=" +
+            this.priceLT +
+            "&limit=" +
+            this.limit +
+            "&page=" +
+            page +
+            "&sortby=" +
+            this.typeSort +
+            "&sort=" +
+            this.isSort
+        );
+        this.totalPage = Math.ceil(response.data.totalElements / 4);
+        return response.data.content;
+      } catch (error) {
+        console.error(error);
+      }
+    },
   },
 
   async created() {
@@ -179,6 +289,9 @@ export default {
     this.products[2] = await this.getList(2);
     this.products[3] = await this.getList(3);
     this.products[4] = await this.getList(4);
+
+    this.saleproducts[1] = await this.getListSale(1);
+    this.saleproducts[2] = await this.getListSale(2);
   },
 };
 </script>
@@ -253,6 +366,16 @@ export default {
   border-radius: 30px;
   margin: 15px;
   border: 2px solid #c0c0c0;
+  position: relative;
+}
+
+.sale {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  font-size: 20px;
+  color: red;
+  font-weight: 700;
 }
 
 .item:hover {
@@ -367,5 +490,15 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
+  flex-wrap: wrap;
+}
+@media (max-width: 739px) {
+  .slider {
+    height: 500px;
+  }
+  .slider4,
+  .slider2 {
+    padding-left: 1000px;
+  }
 }
 </style>

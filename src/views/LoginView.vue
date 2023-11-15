@@ -7,7 +7,7 @@
       </div>
       <div class="login-content">
         <div action="index.html">
-          <form @submit.prevent="checkAcountUser">
+          <form @submit.prevent="submitForm">
             <img src="../assets/img/avatar.svg" />
             <h2 class="title">Welcome</h2>
             <div class="input-div one">
@@ -22,6 +22,9 @@
                   v-model="username"
                 />
               </div>
+              <span v-if="errors.username">
+                {{ errors.username }}
+              </span>
             </div>
             <div class="input-div pass">
               <div class="i">
@@ -35,8 +38,11 @@
                   v-model="password"
                 />
               </div>
+              <span v-if="errors.password">
+                {{ errors.password }}
+              </span>
             </div>
-            <button type="submit" class="btn" @click="checkAcountUser">Login</button>
+            <button type="submit" class="btn">Login</button>
           </form>
           <div style="display: flex; justify-content: space-between">
           <router-link to="/register">Register</router-link>
@@ -57,50 +63,77 @@ export default {
       password: "",
       token: "",
       user: {},
+      errors: {},
     };
   },
 
     props: ["islogin", "isAdmin", "urlbe"],
 
   methods: {
+    async submitForm() {
+      this.errors = {};
+
+      if (this.username == "") {
+        this.errors.username = "Username is required.";
+      } else if (!await this.checkAcountUser()) {
+        this.errors.username = "Username not exists.";
+      }
+
+      if (this.password == "") {
+        this.errors.password = "Password is required.";
+      } else if (!this.validPassword(this.password)) {
+        this.errors.password = "Password must be at least 6 characters.";
+      }
+
+      if (Object.keys(this.errors).length === 0) {
+        await this.login();
+      }
+    },
+
     async login() {
       try {
-        const response = await axios.post(this.urlbe + "/api/login", {
+        const response = await axios.post("http://localhost:8762/auth/login", {
           username: this.username,
           password: this.password,
         });
-        this.token = response.data.jwt;
+        this.token = response.data;
         localStorage.setItem("token", this.token);
         window.location.replace("http://localhost:8080/");
       } catch (error) {
-        alert("Mật khẩu không đúng");
+        this.errors.password = "Mật khẩu không đúng";
       }
     },
 
     async current() {
       try {
-        const response = await axios.get(this.urlbe + "/api/current", {
+        const response = await axios.get("http://localhost:8762/auth/current", {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
         });
-        this.user = response.data.userEntity;
+        this.user = response.data;
         return this.user;
       } catch (error) {
         console.error(error);
       }
     },
+    
+    validPassword(password) {
+      return password.length >= 6;
+    },
 
     async checkAcountUser() {
       try {
         const response = await axios.get(
-          this.urlbe + "/user/checkusername?username=" + this.username, {
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-          },
-        });
-        if(response.data == true){
-          this.login()
-        } else {
-          alert("Tài khoản không tồn tại");
-        }
+          this.urlbe + "/user/checkusername?username=" + this.username,
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          }
+        );
+        return response.data;
       } catch (error) {
         console.error(error);
       }
@@ -218,6 +251,13 @@ form {
 .input-div > div {
   position: relative;
   height: 45px;
+}
+
+.input-div span {
+  bottom: 0;
+  left: 1;
+  position: absolute;
+  color: red;
 }
 
 .input-div > div > h5 {

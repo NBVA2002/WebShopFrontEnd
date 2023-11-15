@@ -10,7 +10,8 @@
           >
             <img
               :src="
-                this.urlbe + '/file/' +
+                this.urlbe +
+                '/file/' +
                 cartegoryItem.product.imageEntities[0].imgURL
               "
               alt=""
@@ -21,27 +22,21 @@
               <h3>Size: {{ cartegoryItem.size }}</h3>
               <h3>{{ formatPrice(cartegoryItem.product.price) }}</h3>
             </div>
+            <div class="item-discount">
+              <h2>Giảm giá(%)</h2>
+              <h3>{{ cartegoryItem.product.discount }}</h3>
+            </div>
             <div class="item-quantity">
-              <h3>Số lượng:</h3>
+              <h2>Số lượng:</h2>
               <div class="select__num-item">
-                <div
-                  class="num-item"
-                  @click="setNumItem(idx, -1)"
-                >
-                  -
-                </div>
+                <div class="num-item" @click="setNumItem(idx, -1)">-</div>
                 <input
                   type="text"
                   class="input__num-item"
                   :placeholder="cartegoryItem.quantity"
                   v-model="cartegoryItem.quantity"
                 />
-                <div
-                  class="num-item"
-                  @click="setNumItem(idx, 1)"
-                >
-                  +
-                </div>
+                <div class="num-item" @click="setNumItem(idx, 1)">+</div>
               </div>
             </div>
             <button class="decart" @click="deCart(idx)">x</button>
@@ -51,9 +46,9 @@
       <div class="order-sumary">
         <h1>Tổng tiền:</h1>
         <div class="total">
-          <h1>{{ formatPrice(amount) }}</h1>
+          <h1>={{ formatPrice(amount) }}</h1>
         </div>
-          <button class="btn-order" @click="sendOrder">Đặt hàng</button>
+        <button class="btn-order" @click="sendOrder">Đặt hàng</button>
       </div>
     </div>
   </div>
@@ -61,18 +56,22 @@
 
 <script>
 import axios from "axios";
+import SockJS from "sockjs-client";
+import Stomp from "webstomp-client";
 export default {
   data() {
     return {
       shoppingCart: [],
       orderId: 0,
       amount: 0,
+      messages: [],
     };
   },
 
-    props: ["islogin", "isAdmin", "urlbe"],
+  props: ["islogin", "isAdmin", "urlbe", "user"],
 
   created() {
+    this.connect();
     if (
       JSON.parse(localStorage.getItem("shoppingCart")) == null ||
       JSON.parse(localStorage.getItem("shoppingCart")).length == 0
@@ -83,7 +82,9 @@ export default {
       this.shoppingCart.reverse();
       console.log(this.shoppingCart.length);
       this.shoppingCart.forEach((cartItem) => {
-        this.amount += cartItem.product.price * cartItem.quantity;
+        this.amount +=
+          ((cartItem.product.price * (100 - cartItem.product.discount)) / 100) *
+          cartItem.quantity;
       });
     }
   },
@@ -107,23 +108,33 @@ export default {
     setNumItem(idx, num) {
       if (this.shoppingCart[idx].quantity + num > 0) {
         this.shoppingCart[idx].quantity += num;
-        localStorage.setItem("shoppingCart", JSON.stringify(this.shoppingCart.reverse()));
-      this.shoppingCart.reverse() 
+        localStorage.setItem(
+          "shoppingCart",
+          JSON.stringify(this.shoppingCart.reverse())
+        );
+        this.shoppingCart.reverse();
       }
       console.log(this.shoppingCart[idx].quantity + num);
-      this.amount = 0
+      this.amount = 0;
       this.shoppingCart.forEach((cartItem) => {
-        this.amount += cartItem.product.price * cartItem.quantity;
+        this.amount +=
+          ((cartItem.product.price * (100 - cartItem.product.discount)) / 100) *
+          cartItem.quantity;
       });
     },
 
     deCart(idx) {
       this.shoppingCart.splice(idx, 1);
-      localStorage.setItem("shoppingCart", JSON.stringify(this.shoppingCart.reverse()));
-      this.shoppingCart.reverse() 
-      this.amount = 0
+      localStorage.setItem(
+        "shoppingCart",
+        JSON.stringify(this.shoppingCart.reverse())
+      );
+      this.shoppingCart.reverse();
+      this.amount = 0;
       this.shoppingCart.forEach((cartItem) => {
-        this.amount += cartItem.product.price * cartItem.quantity;
+        this.amount +=
+          ((cartItem.product.price * (100 - cartItem.product.discount)) / 100) *
+          cartItem.quantity;
       });
     },
 
@@ -140,6 +151,7 @@ export default {
           console.log(this.shoppingCart[i].product.id);
         }
         localStorage.removeItem("shoppingCart");
+        this.sendMessage("đơn hàng #" + this.orderId);
         alert("Đặt hàng thành công");
         this.$router.push("/user");
       } else {
@@ -151,8 +163,8 @@ export default {
     async createOder() {
       try {
         const response = await axios.post(
-          this.urlbe + "/order/create",
-          {},
+          // this.urlbe + "/order/create",
+          "http://localhost:8762/order/create",
           {
             headers: {
               "Access-Control-Allow-Origin": "*",
@@ -169,7 +181,11 @@ export default {
     async addCartItemOder(pid, size, quantity) {
       try {
         const response = await axios.post(
-          this.urlbe + "/cart/create/" + this.orderId + "?pid=" + pid,
+          "http://localhost:8762/order/cart/create/" +
+            this.orderId +
+            "?pid=" +
+            pid,
+          // this.urlbe + "/cart/create/" + this.orderId + "?pid=" + pid,
           {
             size: size,
             quantity: quantity,
@@ -185,6 +201,35 @@ export default {
       } catch (error) {
         console.error(error);
       }
+    },
+
+    connect() {
+      var socket = new SockJS("http://localhost:8085/ws");
+      this.stompClient = Stomp.over(socket);
+      this.stompClient.connect({}, () => {
+        this.stompClient.subscribe("/topic/public", (tick) => {
+          this.messages.push(tick.body);
+        });
+        this.stompClient.subscribe(
+          "/user/" + this.user.id + "/queue/reply",
+          (tick) => {
+            this.messages.push(JSON.parse(tick.body).content);
+          }
+        );
+      });
+    },
+
+    sendMessage(msg) {
+      var objectMessage = {
+        sender: this.user.id,
+        content: msg,
+        type: "CHAT",
+        receiver: "1",
+      };
+      this.stompClient.send(
+        "/app/chat.sendMessagePrivate",
+        JSON.stringify(objectMessage)
+      );
     },
   },
 };
@@ -202,7 +247,6 @@ export default {
   margin-top: 20px;
   margin-bottom: 20px;
   background-color: #c0c0c0;
-  
 }
 
 .order-sumary {
@@ -252,7 +296,7 @@ export default {
 
 .item-product {
   padding: 20px;
-  width: 350px;
+  width: 330px;
   display: inline-block;
   text-align: left;
 }
@@ -276,6 +320,16 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-left: 20px;
+}
+
+.item-discount {
+  width: 130px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 40px;
 }
 
 .select__num-item {

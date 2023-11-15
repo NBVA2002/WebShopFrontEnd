@@ -1,7 +1,20 @@
 <template>
   <div class="user-container">
-    <hr />
-    <h1 class="user-heading">Tài khoản của tôi</h1>
+    <h1 class="user-heading">
+      <img
+        :src="this.urlbe + '/file/' + user.avatarUrl"
+        alt=""
+        class="avt-img"
+        v-if="user.avatarUrl != null"
+      />
+      <img
+        src="../assets/images/people/143086968_2856368904622192_1959732218791162458_n.png"
+        alt=""
+        class="avt-img"
+        v-if="user.avatarUrl == null"
+      />
+      Hello, {{ user.lastName }}
+    </h1>
     <div class="user-info">
       <hr />
       <table class="user-details">
@@ -32,30 +45,53 @@
         <button @click="getOrder" class="button edit-button">
           Xem đơn hàng
         </button>
+        <!-- <div style="display: flex;justify-content: space-between;">
+      <div></div> -->
+        <button class="logout" @click="logout">
+          Đăng xuất <font-awesome-icon :icon="['fas', 'right-from-bracket']" />
+        </button>
+        <!-- </div> -->
       </div>
     </div>
     <div v-if="editing" class="edit-form">
       <h2 class="form-heading">Chỉnh sửa thông tin</h2>
-      <form @submit.prevent="saveUserInfo" class="form">
+      <form @submit.prevent="updateUserInfo" class="form">
         <div class="form-group">
-          <label for="edit_username">Tên người dùng:</label>
+          <label>Họ đệm:</label>
           <input
             type="text"
             id="edit_username"
-            v-model="user.username"
+            v-model="user.firstName"
             class="form-input"
-            required
           />
+          <span v-if="errors.firstName">
+            {{ errors.firstName }}
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Tên:</label>
+          <input
+            type="text"
+            id="edit_username"
+            v-model="user.lastName"
+            class="form-input"
+          />
+          <span v-if="errors.lastName">
+            {{ errors.lastName }}
+          </span>
         </div>
         <div class="form-group">
           <label for="edit_email">Email:</label>
           <input
             type="email"
             id="edit_email"
-            v-model="user.email"
+            v-model="email"
             class="form-input"
             required
           />
+          <span v-if="errors.email">
+            {{ errors.email }}
+          </span>
         </div>
         <div class="form-group">
           <label for="edit_phone">Số điện thoại:</label>
@@ -66,6 +102,9 @@
             class="form-input"
             required
           />
+          <span v-if="errors.phone">
+            {{ errors.phone }}
+          </span>
         </div>
         <div class="form-group">
           <label for="edit_address">Địa chỉ:</label>
@@ -76,6 +115,22 @@
             class="form-input"
             required
           />
+          <span v-if="errors.address">
+            {{ errors.address }}
+          </span>
+        </div>
+        <div class="form-group" style="justify-content: flex-start">
+          <div>
+            <label for="edit_address">Thay avatar:</label>
+            <input
+              type="file"
+              id="edit_address"
+              class="form-input"
+              @change="inputImage"
+              accept="image/gif, image/jpeg, image/png"
+              style="width: 160px"
+            />
+          </div>
         </div>
         <div class="display-btn">
           <button type="submit" class="button primary-button">
@@ -89,8 +144,15 @@
     </div>
     <div v-if="changingPassword" class="password-form">
       <h2 class="form-heading">Thay đổi mật khẩu</h2>
-      <form @submit.prevent="changePassword" class="form">
-        <div class="form-group">
+      <form
+        @submit.prevent="changePassword"
+        class="form"
+        style="width: 60%; justify-content: center"
+      >
+        <div
+          class="form-group"
+          style="width: 100%; justify-content: space-between"
+        >
           <label for="current_password">Mật khẩu hiện tại:</label>
           <input
             type="password"
@@ -99,18 +161,30 @@
             class="form-input"
             required
           />
+          <span v-if="errors.currentPassword">
+            {{ errors.currentPassword }}
+          </span>
         </div>
-        <div class="form-group">
+        <div
+          class="form-group"
+          style="width: 100%; justify-content: space-between"
+        >
           <label for="new_password">Mật khẩu mới:</label>
           <input
             type="password"
             id="new_password"
-            v-model="user.password"
+            v-model="newPassword"
             class="form-input"
             required
           />
+          <span v-if="errors.newPassword">
+            {{ errors.newPassword }}
+          </span>
         </div>
-        <div class="form-group">
+        <div
+          class="form-group"
+          style="width: 100%; justify-content: space-between"
+        >
           <label for="confirm_password">Xác nhận mật khẩu mới:</label>
           <input
             type="password"
@@ -119,6 +193,9 @@
             class="form-input"
             required
           />
+          <span v-if="errors.confirmPassword">
+            {{ errors.confirmPassword }}
+          </span>
         </div>
         <div class="display-btn">
           <button type="submit" class="button primary-button">
@@ -148,10 +225,11 @@
 
           <div class="display-item">
             <h4 style="width: 120px"></h4>
-            <h4 style="width: 235px">Tên sản phẩm</h4>
+            <h4 style="width: 320px">Tên sản phẩm</h4>
             <h4 style="width: 50px">Size</h4>
             <h4 style="width: 100px">Số lượng</h4>
             <h4 style="width: 90px">Giá tiền</h4>
+            <h4 style="width: 90px">Giảm giá</h4>
             <h4 style="width: 100px">Thành tiền</h4>
             <h4></h4>
           </div>
@@ -164,19 +242,28 @@
             >
               <img
                 :src="
-                  this.urlbe + '/file/' +
+                  this.urlbe +
+                  '/file/' +
                   cartItem.productEntity.imageEntities[0].imgURL
                 "
                 alt=""
                 class="item-img"
               />
               <h2>{{ cartItem.productEntity.productName }}</h2>
-              <h3 style="width: 30px">{{ cartItem.size }}</h3>
+              <h3 style="width: 50px">{{ cartItem.size }}</h3>
               <h3 style="width: 100px">{{ cartItem.quantity }}</h3>
               <h3>{{ formatPrice(cartItem.productEntity.price) }}</h3>
+              <h3 style="width: 90px">
+                {{ cartItem.productEntity.discount }}%
+              </h3>
               <h3>
                 {{
-                  formatPrice(cartItem.productEntity.price * cartItem.quantity)
+                  formatPrice(
+                    ((cartItem.productEntity.price *
+                      (100 - cartItem.productEntity.discount)) /
+                      100) *
+                      cartItem.quantity
+                  )
                 }}
               </h3>
               <h3></h3>
@@ -207,10 +294,6 @@
         </div>
       </div>
     </div>
-    <div style="display: flex;justify-content: space-between;">
-      <div></div>
-    <button class="logout" @click="logout">Đăng xuất <font-awesome-icon :icon="['fas', 'right-from-bracket']" /></button>
-    </div>
   </div>
 </template>
 
@@ -220,9 +303,13 @@ export default {
   data() {
     return {
       username: "Người dùng mẫu",
-      email: "example@example.com",
+      email: "",
       phoneNumber: "1234567890",
-      address: "Địa chỉ mẫu",
+      firstName: "",
+      lastName: "",
+      phone: "",
+      address: "",
+      avatarUrl: "",
       editedGender: "",
       editing: false,
       changingPassword: false,
@@ -238,6 +325,7 @@ export default {
       order: [],
       pageNumber: 1,
       totalPage: 0,
+      errors: {},
     };
   },
 
@@ -266,17 +354,13 @@ export default {
       this.editedGender = this.gender;
     },
 
-    saveUserInfo() {
-      this.username = this.editedUsername;
-      this.email = this.editedEmail;
-      this.phoneNumber = this.editedPhoneNumber;
-      this.address = this.editedAddress;
-      this.gender = this.editedGender;
+    cancelEdit() {
       this.editing = false;
     },
 
-    cancelEdit() {
-      this.editing = false;
+    inputImage(event) {
+      this.avatarUrl = event.target.files[0];
+      console.log(this.avatarUrl);
     },
 
     changePasswordForm() {
@@ -284,12 +368,14 @@ export default {
     },
 
     changePassword() {
-      if (this.user.password !== this.confirmPassword) {
-        alert("Mật khẩu mới và xác nhận mật khẩu mới không khớp.");
-        return;
+      if (this.user.password != this.currentPassword) {
+        this.errors.newPassword = "Mật khẩu hiện tại không đúng";
+      } else if (this.confirmPassword != this.newPassword) {
+        this.errors.confirmPassword = "Mật khẩu xác nhận không đúng";
       }
-
-      // Sau khi thay đổi thành công:
+      if (Object.keys(this.errors).length === 0) {
+        this.updateUser();
+      }
       this.changingPassword = false;
       alert("Thay đổi mật khẩu thành công!");
       this.currentPassword = "";
@@ -320,15 +406,158 @@ export default {
       return "Chưa được xử lý";
     },
 
+    isVietnamesePhoneNumber(number) {
+      return /^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(
+        number
+      );
+    },
+
+    validEmail(email) {
+      var re =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
+    },
+
+    async checkEmail() {
+      try {
+        const response = await axios.get(
+          this.urlbe + "/user/checkemail?email=" + this.email,
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          }
+        );
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async updateUserInfo() {
+      this.errors = {};
+
+      this.firstName = this.user.firstName;
+      if (this.user.firstName == "") {
+        this.errors.firstName = "FirstName is required.";
+      }
+
+      this.lastName = this.user.lastName;
+      if (this.lastName == "") {
+        this.errors.lastName = "LastName is required.";
+      }
+
+      this.phone = this.user.phone;
+      if (this.phone == "") {
+        this.errors.phone = "Phone number is required.";
+      } else if (!this.isVietnamesePhoneNumber(this.phone)) {
+        this.errors.phone = "Phone number is not valid.";
+      }
+
+      if (this.email == "") {
+        this.errors.email = "Email is required.";
+      } else if (!this.validEmail(this.email)) {
+        this.errors.email = "Email is not valid.";
+      } else if (await this.checkEmail() && (this.email != this.user.email)) {
+        this.errors.email = "Email already exists.";
+      }
+
+      this.address = this.user.address;
+      if (this.address == "") {
+        this.errors.address = "Address is required.";
+      }
+
+      if (Object.keys(this.errors).length === 0) {
+        await this.updateUser();
+      }
+    },
+
+    async updateUser() {
+      if (this.firstName != "") {
+        this.user.firstName = this.firstName;
+      }
+      if (this.email != "") {
+        this.user.email = this.email;
+      }
+      if (this.phone != "") {
+        this.user.phone = this.phone;
+      }
+      if (this.address != "") {
+        this.user.address = this.address;
+      }
+      if (this.newPassword != "") {
+        this.user.password = this.newPassword;
+      }
+
+      try {
+        const response = await axios.put(
+          this.urlbe + "/user/update/" + this.user.id,
+          {
+            username: this.user.username,
+            password: this.user.password,
+            roles: this.user.roles,
+            firstName: this.user.firstName,
+            lastName: this.user.lastName,
+            phone: this.user.phone,
+            email: this.user.email,
+            address: this.user.address,
+            avatarUrl: this.user.avatarUrl,
+            userInfoEntity: {
+              id: this.user.userInfoEntity.id,
+              firstName: this.user.firstName,
+              lastName: this.user.lastName,
+              avatarUrl: this.user.avatarUrl,
+            },
+          },
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }
+        );
+        if (this.avatarUrl != "") {
+          this.upLoadFile(this.avatarUrl, this.user.id);
+        }
+        this.user = response.data;
+        alert("Cập nhật thông tin thành công");
+        window.location.replace("http://localhost:8080/user");
+        return response;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async upLoadFile(imgProduct, pid) {
+      let formdata = new FormData();
+      formdata.append("file", imgProduct);
+      formdata.append("uid", pid);
+      try {
+        const response = await axios.post(
+          this.urlbe + "/file/avatar_upload",
+          formdata,
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }
+        );
+        return response;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     async current() {
       try {
-        const response = await axios.get(this.urlbe + "/api/current", {
+        const response = await axios.get("http://localhost:8762/auth/current", {
           headers: {
             "Access-Control-Allow-Origin": "*",
             Authorization: "Bearer " + localStorage.getItem("token"),
           },
         });
-        this.user = response.data.userEntity;
+        this.user = response.data;
         return this.user;
       } catch (error) {
         console.error(error);
@@ -338,7 +567,8 @@ export default {
     async getListOrder() {
       try {
         const response = await axios.get(
-          this.urlbe + "/order/list/" +
+          this.urlbe +
+            "/order/list/" +
             this.user.id +
             "?limit=1&page=" +
             this.pageNumber +
@@ -371,11 +601,12 @@ export default {
     },
   },
 
-  created() {
+  async created() {
     if (!this.islogin) {
       this.$router.push("/login");
     } else {
-      this.current();
+      await this.current();
+      this.email = this.user.email;
     }
   },
 
@@ -401,7 +632,7 @@ export default {
 
 <style scoped>
 .user-container {
-  max-width: 1000px;
+  max-width: 1440px;
   margin: 0 auto;
   margin-top: 100px;
   padding: 20px;
@@ -410,6 +641,14 @@ export default {
 .user-heading {
   font-size: 30px;
   margin-bottom: 20px;
+}
+
+.avt-img {
+  width: 120px;
+  height: 120px;
+  border: 3px solid #cccccc;
+  border-radius: 200px;
+  margin-right: 10px;
 }
 
 .user-info {
@@ -428,6 +667,7 @@ export default {
 .edit-button {
   padding: 8px 16px;
   border-radius: 5px;
+  width: 171px;
   cursor: pointer;
   transition: background-color 0.3s ease;
   background-color: #42b983;
@@ -445,28 +685,46 @@ export default {
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
+  padding: 20px;
 }
 
 .form-heading {
-  font-size: 20px;
-  margin-bottom: 10px;
+  font-size: 30px;
 }
 
 .form {
   display: flex;
-  flex-direction: column;
+  display: flex;
+  margin-top: 40px;
+  flex-wrap: wrap;
 }
 
 .form-group {
+  width: 50%;
   margin-bottom: 15px;
+  display: flex;
+  justify-content: space-around;
+  position: relative;
+}
+
+.form-group span {
+  bottom: 0;
+  left: 1;
+  position: absolute;
+  color: red;
+}
+
+.form-group label {
+  font-size: 20px;
+  padding: 8px 16px;
+  border-radius: 5px;
 }
 
 .form-input {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  width: 100%;
+  width: 500px;
 }
 
 .form-input:focus {
@@ -475,6 +733,7 @@ export default {
 }
 
 .display-btn {
+  width: 100%;
   display: flex;
   justify-content: space-around;
 }
@@ -641,6 +900,7 @@ export default {
 }
 
 .logout {
+  width: 171px;
   padding: 8px 16px;
   border-radius: 5px;
   cursor: pointer;
@@ -650,10 +910,8 @@ export default {
 }
 
 .logout:hover {
-
   background-color: #42b983;
   color: #fff;
 }
-
 </style>
 

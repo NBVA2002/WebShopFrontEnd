@@ -2,17 +2,15 @@
   <div class="products">
     <div class="banner"></div>
     <div class="grid">
-      <div class="select-type">
+      <!-- <div class="select-type">
         <div
-          class="sort__by-name"
-          v-for="type in listType"
-          :key="type.id"
+          class="sort__by-name"  v-for="type in listType" :key="type.id"
           @click="changeType(type.id)"
           :class="{ typesort__active: category == type.id }"
         >
           {{ type.categoryName }}
         </div>
-
+        
         <div class="btn_untype" @click="unType" v-if="displayTypeFilter">x</div>
       </div>
 
@@ -141,7 +139,7 @@
 
       <div class="pagination__left">
         <span>Tìm thấy {{ totalItem }} kết quả : </span>
-      </div>
+      </div> -->
 
       <div class="list-item">
         <div class="item" v-for="product in products" :key="product.id">
@@ -150,32 +148,25 @@
             :to="{ name: 'product', params: { id: product.id } }"
           >
             <img
-              :src="this.urlbe + '/file/' + product.imageEntities[0].imgURL"
+              :src="
+                this.urlbe + '/file/' + product.imageEntities[0].imgURL
+              "
               alt=""
               class="item-img"
             />
             <div class="sale" v-if="product.discount > 0">
-              <img
-                src="../assets/images/features/—Pngtree—sale_146155.png"
-                alt=""
-                class=""
-                style="width: 100px; height: 100px"
-              />
-              {{ product.discount }}%
+            <img
+              src="../assets/images/features/—Pngtree—sale_146155.png"
+              alt=""
+              class=""
+              style="width: 100px; height: 100px;"
+            />
+            {{product.discount}}%
             </div>
             <div class="product-name">{{ product.productName }}</div>
             <div class="price-sold">
-              <h2 v-if="product.discount == 0">
-                {{ formatPrice(product.price) }}
-              </h2>
-              <h2
-                v-if="product.discount > 0"
-                style="color: red; font-weight: 700"
-              >
-                {{
-                  formatPrice((product.price * (100 - product.discount)) / 100)
-                }}
-              </h2>
+              <h2 v-if="product.discount == 0">{{ formatPrice(product.price) }}</h2>
+              <h2 v-if="product.discount > 0" style="color: red; font-weight: 700">{{ formatPrice(product.price * (100 - product.discount)/100) }}</h2>
               <h4>Đã bán {{ product.numOrder }}</h4>
             </div>
           </router-link>
@@ -212,7 +203,7 @@ export default {
     return {
       listType: [],
       products: [],
-      url: this.urlbe + "/product/list?",
+      url: this.urlbe + "/product/sale?",
       search: "",
       gender: "",
       categorytype: 0,
@@ -232,8 +223,8 @@ export default {
       displayTypeFilter: false,
     };
   },
-
-  props: ["islogin", "isAdmin", "urlbe"],
+  
+    props: ["islogin", "isAdmin", "urlbe"],
 
   created() {
     this.getList();
@@ -369,6 +360,7 @@ export default {
         console.error(error);
       }
     },
+
   },
 
   computed: {
@@ -420,9 +412,9 @@ export default {
 }
 
 .banner {
-  background-image: url("../assets/images/banner/b1.jpg");
+  background-image: url("../assets/images/banner/sales_banners.jpg");
   width: 100%;
-  height: 400px;
+  height: 360px;
   /* background-repeat: no-repeat; */
   background-size: cover;
   background-position: center;
